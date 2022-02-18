@@ -12,6 +12,10 @@ State::State(const int& width, const int& height)
     m_FOV = 54.0f;
 	m_DropPos = glm::vec2(0.5f);
 	m_NormalDisplay = false;
+	m_NowTime = glfwGetTime();
+	m_LastTime = 0;
+	m_DeltaTime = 0;
+	m_DropTest = false;
 }
 
 int State::Init()
@@ -64,5 +68,17 @@ bool State::GetNormalDisplay() const
 void State::ToggleNormalDisplay()
 {
 	m_NormalDisplay = !m_NormalDisplay;
+}
+
+float State::GetDeltaTime() const
+{
+	return m_DeltaTime;
+}
+
+void State::Update()
+{
+	m_NowTime = glfwGetTime();
+	m_DeltaTime = m_NowTime - m_LastTime;
+	m_LastTime = m_NowTime;
 }
 

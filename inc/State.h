@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Window.h"
 
+
 extern void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 extern void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 extern void processInput();
@@ -21,7 +22,12 @@ public:
 	bool GetDropTest() const;
 	bool GetNormalDisplay() const;
 	void ToggleNormalDisplay();
+	float GetDeltaTime() const;
+	void Update();
 private:
+	float m_DeltaTime;
+	float m_NowTime;
+	float m_LastTime;
 	glm::vec2 m_DropPos;
 	bool m_DropTest;
 	Window m_Window;

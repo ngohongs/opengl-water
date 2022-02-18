@@ -220,6 +220,8 @@ int Application::Run()
 
     while (!glfwWindowShouldClose(window))
     {
+        state.Update();
+        float deltaTime = state.GetDeltaTime();
         processInput();
         
 
@@ -236,9 +238,12 @@ int Application::Run()
         waveProcess.SetFloat("texelSize", 1.0f / (float)res);
         waveProcess.SetVec2("dropPos", state.GetDropPos());
         waveProcess.SetBool("drop", state.GetDropTest());
+        waveProcess.SetFloat("deltaTime", deltaTime);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         quad.Draw();
         state.SetDropTest(false);
+
+        
 
         // Display
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

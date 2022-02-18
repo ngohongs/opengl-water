@@ -5,6 +5,7 @@ uniform sampler2D tex;
 uniform float texelSize;
 uniform bool drop;
 uniform vec2 dropPos;
+uniform float deltaTime;
 
 float heightWithDrop(vec2 pos)
 {
@@ -15,7 +16,7 @@ float heightWithDrop(vec2 pos)
 
     float drop = max(0.0, 1.0 - length( pos - dropPos ) / 0.06);
 	drop = 0.5 - cos(drop*3.1415926535899793)*0.5;
-    return drop;
+    return 2 * drop;
 }
 
 float height(vec2 pos)
@@ -45,13 +46,28 @@ void main()
     float vpdy = texture(tex, pdy).r + heightWithDrop(pdy);
     float vndy = texture(tex, ndy).r + heightWithDrop(ndy);
 
+    float nsum = vpdx + vndx + vpdy + vndy;
     float average =  (vpdx + vndx + vpdy + vndy) / 4.0;
     
+    
+   /*
     float old_u = old_info.r + heightWithDrop(texCoord);
     float old_v = old_info.g;
     float new_v = old_v + average - old_u;
     new_v *= 0.99;
     float new_u = old_u + new_v;
+    */
+
+    float old_u = old_info.r + heightWithDrop(texCoord);
+    float old_v = old_info.g;
+
+    float c = 0.5;
+    float h = texelSize;
+    float f = c * c * (nsum - 4 * old_u) / (h * h);
+    float new_v = old_v + f * deltaTime;
+    new_v = new_v * 0.997;
+    float new_u = old_u + new_v * deltaTime; 
+
 
     vec4 new_info = vec4(new_u, new_v, 0, 1);
 
