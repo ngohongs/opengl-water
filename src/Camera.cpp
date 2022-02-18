@@ -52,11 +52,6 @@ void Camera::Slide(const float& c, const DirectionEnum& dir)
 	m_Eye = translateMatrix * glm::vec4(m_Eye, 1.0f);
 }
 
-glm::vec3 Camera::GetEye() const
-{
-	return m_Eye;
-}
-
 void Camera::Rotate(double xoffset, double yoffset)
 {
 	float sensitivity = 0.1f;
@@ -82,4 +77,37 @@ void Camera::Rotate(double xoffset, double yoffset)
 	direction.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 	m_Direction = glm::normalize(direction);
 }
+
+void Camera::SetEye(const glm::vec3& eye)
+{
+	m_Eye = eye;
+}
+
+void Camera::SetUp(const glm::vec3& up)
+{
+	m_Up = up;
+}
+
+void Camera::SetDirection(const glm::vec3& dir)
+{
+	m_Direction = dir;
+}
+
+glm::vec3 Camera::GetEye() const
+{
+	return m_Eye;
+}
+
+glm::vec3 Camera::GetUp() const
+{
+	return m_Up;
+}
+
+glm::vec3 Camera::GetDirection() const
+{
+	return m_Direction;
+}
+
+
+
 

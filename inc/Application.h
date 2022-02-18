@@ -11,6 +11,7 @@
 #include "PlaneGenerator.h"
 #include "Crosshair.h"
 #include "Skybox.h"
+#include "Light.h"
 
 class Application
 {

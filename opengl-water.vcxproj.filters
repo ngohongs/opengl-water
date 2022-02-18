@@ -48,6 +48,9 @@
     <ClCompile Include="src\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Shader.h">
@@ -86,6 +89,9 @@
     <ClInclude Include="inc\Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\gen.vert" />
@@ -113,5 +119,9 @@
     <None Include="shaders\normaldisplay.vert" />
     <None Include="shaders\normaldisplay.geom" />
     <None Include="shaders\normaldisplay.frag" />
+    <None Include="shaders\positions.vert" />
+    <None Include="shaders\positions.frag" />
+    <None Include="shaders\displaytexture.vert" />
+    <None Include="shaders\displaytexture.frag" />
   </ItemGroup>
 </Project>

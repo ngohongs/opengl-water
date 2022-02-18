@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Crosshair.cpp" />
     <ClCompile Include="src\PlaneGenerator.cpp" />
@@ -170,12 +171,15 @@
     <ClInclude Include="inc\Window.h" />
     <ClInclude Include="inc\PlaneGenerator.h" />
     <ClInclude Include="inc\Skybox.h" />
+    <ClInclude Include="inc\Light.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\crosshair.frag" />
     <None Include="shaders\crosshair.vert" />
     <None Include="shaders\debug.frag" />
     <None Include="shaders\debug.vert" />
+    <None Include="shaders\displaytexture.frag" />
+    <None Include="shaders\displaytexture.vert" />
     <None Include="shaders\force.frag" />
     <None Include="shaders\force.vert" />
     <None Include="shaders\gen.frag" />
@@ -189,6 +193,8 @@
     <None Include="shaders\normaldisplay.vert" />
     <None Include="shaders\pass.frag" />
     <None Include="shaders\pass.vert" />
+    <None Include="shaders\positions.frag" />
+    <None Include="shaders\positions.vert" />
     <None Include="shaders\skybox.frag" />
     <None Include="shaders\skybox.vert" />
     <None Include="shaders\test.frag" />

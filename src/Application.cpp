@@ -125,6 +125,11 @@ int Application::Run()
     std::cout << debug.AttachShader(FRAGMENT, "shaders/debug.frag") << std::endl;
     std::cout << debug.LinkProgram() << std::endl;
 
+    Shader displayTexture;
+    std::cout << displayTexture.AttachShader(VERTEX, "shaders/displaytexture.vert") << std::endl;
+    std::cout << displayTexture.AttachShader(FRAGMENT, "shaders/displaytexture.frag") << std::endl;
+    std::cout << displayTexture.LinkProgram() << std::endl;
+
     Shader test;
     std::cout << test.AttachShader(VERTEX, "shaders/test.vert") << std::endl;
     std::cout << test.AttachShader(FRAGMENT, "shaders/test.frag") << std::endl;
@@ -157,8 +162,12 @@ int Application::Run()
     std::cout << normalDisplay.AttachShader(FRAGMENT, "shaders/normaldisplay.frag") << std::endl;
     std::cout << normalDisplay.LinkProgram() << std::endl;
 
+    Shader positions;
+    std::cout << positions.AttachShader(VERTEX, "shaders/positions.vert") << std::endl;
+    std::cout << positions.AttachShader(FRAGMENT, "shaders/positions.frag") << std::endl;
+    std::cout << positions.LinkProgram() << std::endl;
 
-    int res = 64;
+    int res = 128;
 
     std::vector<Vertex> planeVert;
     std::vector<unsigned int> planeInd;
@@ -192,6 +201,9 @@ int Application::Run()
 
     Skybox skybox(faces);
 
+    Light light(glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f));
+
     unsigned int framebuffer[2];
     unsigned int textureColorbuffer[2];
     for (int i = 0; i < 2; i++)
@@ -209,14 +221,34 @@ int Application::Run()
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     }
-    
+
+    unsigned int positionsbuffer[2];
+    unsigned int positionsTexture[2];  
+    for (int i = 0; i < 2; i++)
+    {
+        glGenFramebuffers(1, &positionsbuffer[i]);
+        glBindFramebuffer(GL_FRAMEBUFFER, positionsbuffer[i]);
+        glGenTextures(1, &positionsTexture[i]);
+        glBindTexture(GL_TEXTURE_2D, positionsTexture[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, positionsTexture[i], 0);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    }
+
+    Camera& camera = state.GetCamera();
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     GLFWwindow* window = state.GetWindow().GetGLFWWindow();
     glEnable(GL_DEPTH_TEST);
     /* Loop until the user closes the window */
-
     int i = 0;
+    
 
     while (!glfwWindowShouldClose(window))
     {
@@ -226,7 +258,7 @@ int Application::Run()
         
 
         glm::mat4 proj = state.GetProjectionMatrix();
-        glm::mat4 view = state.GetCamera().GetViewMatrix();
+        glm::mat4 view = camera.GetViewMatrix();
 
         // Shallow water calc
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -274,9 +306,6 @@ int Application::Run()
             glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
             plane.Draw();
         }
-        
-
-
         skybox.Draw(proj, view);
 
 
@@ -284,17 +313,33 @@ int Application::Run()
 
         // UI
         glDisable(GL_DEPTH_TEST);
-        debug.Use();
-        debug.SetBool("toggle", false);
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
+        displayTexture.Use();
+        glBindTexture(GL_TEXTURE_2D, positionsTexture[1 - i]);
         debugQuad.Draw();
+
+
+        debug.Use();
+        /*debug.SetBool("toggle", false);
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
+        debugQuad.Draw();*/
+
         debug.SetBool("toggle", true);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
         debuglQuad.Draw();
 
         crosshair.Draw();
        
-
+        //glm::vec3 eye = state.
+        view = light.GetViewMatrix();
+        glBindFramebuffer(GL_FRAMEBUFFER, positionsbuffer[i]);
+        glEnable(GL_DEPTH_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        waveProcess.Use();
+        positions.Use();
+        positions.SetMat4("projection", proj);
+        positions.SetMat4("view", view);
+        positions.SetMat4("model", plane2.GetModelMatrix());
+        plane2.Draw();
 
 
         i = 1 - i;
