@@ -16,6 +16,7 @@ public:
 	Window& GetWindow();
 	Camera& GetCamera();
 	glm::mat4 GetProjectionMatrix() const;
+	glm::mat4 GetOrthogonalMatrix() const;
 	void SetDropPos(const glm::vec2& q);
 	glm::vec2 GetDropPos() const;
 	void SetDropTest(const bool& q);

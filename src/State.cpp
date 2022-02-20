@@ -35,9 +35,16 @@ Camera& State::GetCamera()
 
 glm::mat4 State::GetProjectionMatrix() const
 {
-	int width = m_Window.GetWidth();
-	int height = m_Window.GetHeight();
+	float width = m_Window.GetWidth();
+	float height = m_Window.GetHeight();
 	return glm::perspective(glm::radians(m_FOV), (float) width / (float) height, 0.001f, 100.0f);;
+}
+
+glm::mat4 State::GetOrthogonalMatrix() const
+{
+	float width = m_Window.GetWidth();
+	float height = m_Window.GetHeight();
+	return glm::ortho(-2.0f , 2.0f, -2.0f, 2.0f, 0.001f, 2.4f);
 }
 
 void State::SetDropPos(const glm::vec2& q)

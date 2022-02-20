@@ -65,7 +65,7 @@ void main()
     float h = texelSize;
     float f = c * c * (nsum - 4 * old_u) / (h * h);
     float new_v = old_v + f * deltaTime;
-    new_v = new_v * 0.997;
+    new_v = new_v * 0.991;
     float new_u = old_u + new_v * deltaTime; 
 
 

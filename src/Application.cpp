@@ -167,7 +167,13 @@ int Application::Run()
     std::cout << positions.AttachShader(FRAGMENT, "shaders/positions.frag") << std::endl;
     std::cout << positions.LinkProgram() << std::endl;
 
-    int res = 128;
+    Shader normals;
+    std::cout << normals.AttachShader(VERTEX, "shaders/normals.vert") << std::endl;
+    std::cout << normals.AttachShader(GEOMETRY, "shaders/normals.geom") << std::endl;
+    std::cout << normals.AttachShader(FRAGMENT, "shaders/normals.frag") << std::endl;
+    std::cout << normals.LinkProgram() << std::endl;
+
+    int res = 64;
 
     std::vector<Vertex> planeVert;
     std::vector<unsigned int> planeInd;
@@ -186,6 +192,8 @@ int Application::Run()
     Geometry quad(quadVertices, quadNVertices, quadTriangles, quadNTriangles);
     Geometry debugQuad(dquadVertices, dquadNVertices, dquadTriangles, dquadNTriangles);
     Geometry debuglQuad(dlquadVertices, dlquadNVertices, dlquadTriangles, dlquadNTriangles);
+    Geometry debugdlQuad(ddlquadVertices, ddlquadNVertices, ddlquadTriangles, ddlquadNTriangles);
+    Geometry debugddQuad(ddquadVertices, ddquadNVertices, ddquadTriangles, ddquadNTriangles);
 
 
     Crosshair crosshair;
@@ -201,7 +209,7 @@ int Application::Run()
 
     Skybox skybox(faces);
 
-    Light light(glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+    Light light(glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
         glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f));
 
     unsigned int framebuffer[2];
@@ -240,6 +248,43 @@ int Application::Run()
             std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     }
 
+    unsigned int normalsbuffer[2];
+    unsigned int normalsTexture[2];
+    for (int i = 0; i < 2; i++)
+    {
+        glGenFramebuffers(1, &normalsbuffer[i]);
+        glBindFramebuffer(GL_FRAMEBUFFER, normalsbuffer[i]);
+        glGenTextures(1, &normalsTexture[i]);
+        glBindTexture(GL_TEXTURE_2D, normalsTexture[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, normalsTexture[i], 0);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    }
+
+    unsigned int wavePositionsbuffer[2];
+    unsigned int wavePositionsTexture[2];
+    for (int i = 0; i < 2; i++)
+    {
+        glGenFramebuffers(1, &wavePositionsbuffer[i]);
+        glBindFramebuffer(GL_FRAMEBUFFER, wavePositionsbuffer[i]);
+        glGenTextures(1, &wavePositionsTexture[i]);
+        glBindTexture(GL_TEXTURE_2D, wavePositionsTexture[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, wavePositionsTexture[i], 0);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    }
+
+
     Camera& camera = state.GetCamera();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -248,6 +293,7 @@ int Application::Run()
     glEnable(GL_DEPTH_TEST);
     /* Loop until the user closes the window */
     int i = 0;
+    
     
 
     while (!glfwWindowShouldClose(window))
@@ -288,7 +334,7 @@ int Application::Run()
         wave.SetMat4("projection", proj);
         wave.SetMat4("view", view);
         wave.SetMat4("model", plane.GetModelMatrix());
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         plane.Draw();
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -315,32 +361,54 @@ int Application::Run()
         glDisable(GL_DEPTH_TEST);
         displayTexture.Use();
         glBindTexture(GL_TEXTURE_2D, positionsTexture[1 - i]);
+        debugdlQuad.Draw();
+        glBindTexture(GL_TEXTURE_2D, normalsTexture[1 - i]);
+        debugddQuad.Draw();
+        glBindTexture(GL_TEXTURE_2D, wavePositionsTexture[1 - i]);
         debugQuad.Draw();
-
-
-        debug.Use();
-        /*debug.SetBool("toggle", false);
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
-        debugQuad.Draw();*/
-
         debug.SetBool("toggle", true);
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         debuglQuad.Draw();
 
         crosshair.Draw();
        
-        //glm::vec3 eye = state.
-        view = light.GetViewMatrix();
+        // positions 
         glBindFramebuffer(GL_FRAMEBUFFER, positionsbuffer[i]);
         glEnable(GL_DEPTH_TEST);
+        glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        waveProcess.Use();
         positions.Use();
-        positions.SetMat4("projection", proj);
-        positions.SetMat4("view", view);
+        positions.SetMat4("projection", state.GetOrthogonalMatrix());
+        positions.SetMat4("view", light.GetViewMatrix());
         positions.SetMat4("model", plane2.GetModelMatrix());
+        positions.SetBool("wave", false);
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         plane2.Draw();
 
+        // normals
+        glBindFramebuffer(GL_FRAMEBUFFER, normalsbuffer[i]);
+        glEnable(GL_DEPTH_TEST);
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        normals.Use();
+        normals.SetMat4("projection", state.GetOrthogonalMatrix());
+        normals.SetMat4("view", light.GetViewMatrix());
+        normals.SetMat4("model", plane.GetModelMatrix());
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
+        plane.Draw();
+
+        //wave positions
+        glBindFramebuffer(GL_FRAMEBUFFER, wavePositionsbuffer[i]);
+        glEnable(GL_DEPTH_TEST);
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        positions.Use();
+        positions.SetMat4("projection", state.GetOrthogonalMatrix());
+        positions.SetMat4("view", light.GetViewMatrix());
+        positions.SetMat4("model", plane.GetModelMatrix());
+        positions.SetBool("wave", true);
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
+        plane.Draw();
 
         i = 1 - i;
 
