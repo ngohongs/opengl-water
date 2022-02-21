@@ -366,7 +366,6 @@ int Application::Run()
         debugddQuad.Draw();
         glBindTexture(GL_TEXTURE_2D, wavePositionsTexture[1 - i]);
         debugQuad.Draw();
-        debug.SetBool("toggle", true);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         debuglQuad.Draw();
 
