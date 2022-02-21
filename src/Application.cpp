@@ -1,6 +1,19 @@
 #include "Application.h"
 #include <iostream>
-
+const char * GetGLErrorStr(GLenum err)
+{
+    switch (err)
+    {
+    case GL_NO_ERROR:          return "No error";
+    case GL_INVALID_ENUM:      return "Invalid enum";
+    case GL_INVALID_VALUE:     return "Invalid value";
+    case GL_INVALID_OPERATION: return "Invalid operation";
+    case GL_STACK_OVERFLOW:    return "Stack overflow";
+    case GL_STACK_UNDERFLOW:   return "Stack underflow";
+    case GL_OUT_OF_MEMORY:     return "Out of memory";
+    default:                   return "Unknown error";
+    }
+}
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -285,6 +298,13 @@ int Application::Run()
     }
 
 
+    GLuint query;
+    glGenQueries(1, &query);
+    std::cout << "q: " << query << std::endl;
+    int nSamples = 0;
+    int queryReady = 0;
+    bool inUse = false;
+
     Camera& camera = state.GetCamera();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -295,12 +315,15 @@ int Application::Run()
     int i = 0;
     
     
-
+    GLenum err;
+    
+    
     while (!glfwWindowShouldClose(window))
     {
         state.Update();
         float deltaTime = state.GetDeltaTime();
         processInput();
+        
         
 
         glm::mat4 proj = state.GetProjectionMatrix();
@@ -322,9 +345,12 @@ int Application::Run()
         state.SetDropTest(false);
 
         
+        
+        /*glGetQueryiv(query, GL_QUERY_RESULT, &nSamples);
+        std::cout << nSamples << std::endl;*/
 
         // Display
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        
         glViewport(0, 0, 1920, 1080);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glEnable(GL_DEPTH_TEST);
@@ -335,8 +361,20 @@ int Application::Run()
         wave.SetMat4("view", view);
         wave.SetMat4("model", plane.GetModelMatrix());
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
+        
+
+        glBeginQuery(GL_SAMPLES_PASSED, query);
         plane.Draw();
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glEndQuery(GL_SAMPLES_PASSED);
+        
+        glGetQueryObjectiv(query, GL_QUERY_RESULT, &nSamples);
+        
+        std::cout << nSamples << std::endl;
+        err = glGetError();
+        if (err != GL_NO_ERROR) {
+            std::cout << GetGLErrorStr(err) << std::endl;
+            break;
+        }
 
         gen.Use();
         gen.SetMat4("projection", proj);
@@ -357,7 +395,8 @@ int Application::Run()
 
 
 
-        // UI
+
+        // Debug UI
         glDisable(GL_DEPTH_TEST);
         displayTexture.Use();
         glBindTexture(GL_TEXTURE_2D, positionsTexture[1 - i]);
@@ -366,12 +405,18 @@ int Application::Run()
         debugddQuad.Draw();
         glBindTexture(GL_TEXTURE_2D, wavePositionsTexture[1 - i]);
         debugQuad.Draw();
-        debug.SetBool("toggle", true);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         debuglQuad.Draw();
 
+
+        
+
+
         crosshair.Draw();
        
+
+
+
         // positions 
         glBindFramebuffer(GL_FRAMEBUFFER, positionsbuffer[i]);
         glEnable(GL_DEPTH_TEST);
@@ -397,6 +442,7 @@ int Application::Run()
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         plane.Draw();
 
+
         //wave positions
         glBindFramebuffer(GL_FRAMEBUFFER, wavePositionsbuffer[i]);
         glEnable(GL_DEPTH_TEST);
@@ -409,6 +455,9 @@ int Application::Run()
         positions.SetBool("wave", true);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         plane.Draw();
+
+
+
 
         i = 1 - i;
 
@@ -427,6 +476,7 @@ bool Application::RayCast(double mouseX, double mouseY, glm::vec2& q)
     int height = state.GetWindow().GetHeight();
     glm::vec4 viewport = glm::vec4(0.0f, 0.0f, width, height);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     GLfloat winZ;
     glReadPixels((GLint)mouseX, (GLint)(height - 1 - mouseY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
 
