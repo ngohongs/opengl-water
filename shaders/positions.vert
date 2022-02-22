@@ -16,14 +16,18 @@ uniform sampler2D tex;
 void main()
 {
     vec4 pos;
+    vec4 color;
     if (wave) {
         float height = texture(tex, texCoord).r;
         vec3 offset = vec3(0.0, height, 0.0);
+
         pos = projection * view * model * vec4(aPos + offset, 1.0);
+        color = model * vec4(aPos + offset, 1.0);
     }
     else {
         pos = projection * view * model * vec4(aPos, 1.0);
+        color = model * vec4(aPos, 1.0);
     }
-    fPos = pos;
+    fPos = color;
     gl_Position = pos;
 }   

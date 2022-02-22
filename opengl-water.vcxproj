@@ -174,6 +174,7 @@
     <ClInclude Include="inc\Light.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\caustics.frag" />
     <None Include="shaders\crosshair.frag" />
     <None Include="shaders\crosshair.vert" />
     <None Include="shaders\debug.frag" />
@@ -198,6 +199,8 @@
     <None Include="shaders\pass.vert" />
     <None Include="shaders\positions.frag" />
     <None Include="shaders\positions.vert" />
+    <None Include="shaders\reciever.frag" />
+    <None Include="shaders\reciever.vert" />
     <None Include="shaders\skybox.frag" />
     <None Include="shaders\skybox.vert" />
     <None Include="shaders\test.frag" />
@@ -206,6 +209,9 @@
     <None Include="shaders\wave.vert" />
     <None Include="shaders\waveProcess.frag" />
     <None Include="shaders\waveProcess.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shaders\caustics.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

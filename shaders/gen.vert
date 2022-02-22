@@ -5,10 +5,10 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 
-out vec3 ourColor; // output a color to the fragment shader
+uniform mat4 lightView;
+uniform mat4 orthogonal;
 
 void main()
 {
     gl_Position = projection * view * model * vec4(aPos, 1.0);
-    ourColor = vec3(mix(0.6, 1.0, aPos.x), mix(0.6, 1.0, aPos.y), mix(0.6, 1.0, aPos.z));
 }   

@@ -12,6 +12,7 @@ public:
 	Geometry(const float* verts, const int& vertCnt, const unsigned int * tri, const int& triCnt);
 	void Load(const std::vector<Vertex>& verts, const std::vector<unsigned int> ind);
 	void Load(const float* verts, const int& vertCnt, const unsigned int * tri, const int& indCnt);
+	void LoadGrid(const std::vector<Vertex>& verts);
 	void Bind() const;
 	void Draw() const;
 	void SetPosition(const glm::vec3& pos);

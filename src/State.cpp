@@ -44,7 +44,7 @@ glm::mat4 State::GetOrthogonalMatrix() const
 {
 	float width = m_Window.GetWidth();
 	float height = m_Window.GetHeight();
-	return glm::ortho(-2.0f , 2.0f, -2.0f, 2.0f, 0.001f, 2.4f);
+	return glm::ortho(-1.0f , 1.0f, -1.0f, 1.0f, 0.001f, 100.0f);
 }
 
 void State::SetDropPos(const glm::vec2& q)

@@ -32,3 +32,20 @@ void PlaneGenerator::Generate(const int & res, std::vector<Vertex>& vert, std::v
         }
     }
 }
+
+void PlaneGenerator::GenerateGrid(const int& resX, const int& resY, std::vector<Vertex>& vert)
+{
+    float spacingX = 1.0f / (resX - 1);
+    float spacingY = 1.0f / (resY - 1);
+    for (int i = 0; i < resY; i++)
+    {
+        for (int j = 0; j < resX; j++)
+        {
+            Vertex vertex;
+            vertex.m_Position = 2.0f * glm::vec3(j * spacingX, i * spacingY, 0.0f) - glm::vec3(1.0f, 1.0f, 0.0f);
+            vertex.m_Normal = glm::vec3(0.0f, 0.0f, 1.0f);
+            vertex.m_TextureCoords = glm::vec2(j * spacingX, i * spacingY);
+            vert.push_back(vertex);
+        }
+    }
+}
