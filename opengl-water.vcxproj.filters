@@ -129,6 +129,8 @@
     <None Include="shaders\caustics.frag" />
     <None Include="shaders\reciever.vert" />
     <None Include="shaders\reciever.frag" />
+    <None Include="shaders\lowpass.vert" />
+    <None Include="shaders\lowpass.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\caustics.vert" />

@@ -38,20 +38,20 @@ vec3 calculateTriangleNormal(){
 
 void main(void){
 	vec3 normal = calculateTriangleNormal();
-
+	normal = normalize(mat3(transpose(inverse(model))) * normal);
 	vec4 position = gl_in[0].gl_Position;
 	gl_Position = projection * view * model * position;
-	fNormal = mat3(transpose(inverse(view * model))) * normal;
+	fNormal = normal;
 	EmitVertex();
 	
 	position = gl_in[1].gl_Position;
 	gl_Position = projection * view * model * position;
-	fNormal = mat3(transpose(inverse(view * model))) * normal;
+	fNormal = normal;
 	EmitVertex();
 	
 	position = gl_in[2].gl_Position;
 	gl_Position = projection * view * model * position;
-	fNormal = mat3(transpose(inverse(view * model))) * normal;
+	fNormal = normal;
 	EmitVertex();
 	
 	EndPrimitive();

@@ -196,24 +196,28 @@ int Application::Run()
     std::cout << reciever.AttachShader(FRAGMENT, "shaders/reciever.frag") << std::endl;
     std::cout << reciever.LinkProgram() << std::endl;
 
+    Shader lowpass;
+    std::cout << lowpass.AttachShader(VERTEX, "shaders/lowpass.vert") << std::endl;
+    std::cout << lowpass.AttachShader(FRAGMENT, "shaders/lowpass.frag") << std::endl;
+    std::cout << lowpass.LinkProgram() << std::endl;
 
-
-    int res = 64;
+    int res = 100;
 
     std::vector<Vertex> planeVert;
     std::vector<unsigned int> planeInd;
     PlaneGenerator().Generate(res, planeVert, planeInd);
     Geometry plane(planeVert, planeInd);
+    plane.SetScale(glm::vec3(1.0f));
 
     planeVert.clear();
     planeInd.clear();
     PlaneGenerator().Generate(2, planeVert, planeInd);
     Geometry plane2(planeVert, planeInd);
-    plane2.SetPosition(glm::vec3(0.0f, -0.3f, 0.0f));
-
+    plane2.SetPosition(glm::vec3(0.0f, -0.4f, 0.0f));
+    plane2.SetScale(glm::vec3(1.0f));
 
     planeVert.clear();
-    PlaneGenerator().GenerateGrid(5000, 5000, planeVert);
+    PlaneGenerator().GenerateGrid(1920, 1080, planeVert);
     Geometry grid;
     grid.LoadGrid(planeVert);
 
@@ -268,8 +272,8 @@ int Application::Run()
         glGenTextures(1, &positionsTexture[i]);
         glBindTexture(GL_TEXTURE_2D, positionsTexture[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, positionsTexture[i], 0);
@@ -286,8 +290,8 @@ int Application::Run()
         glGenTextures(1, &normalsTexture[i]);
         glBindTexture(GL_TEXTURE_2D, normalsTexture[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, normalsTexture[i], 0);
@@ -304,8 +308,8 @@ int Application::Run()
         glGenTextures(1, &wavePositionsTexture[i]);
         glBindTexture(GL_TEXTURE_2D, wavePositionsTexture[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, wavePositionsTexture[i], 0);
@@ -321,12 +325,30 @@ int Application::Run()
         glBindFramebuffer(GL_FRAMEBUFFER, causticsbuffer[i]);
         glGenTextures(1, &causticsTexture[i]);
         glBindTexture(GL_TEXTURE_2D, causticsTexture[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 5000, 5000, 0, GL_RGB, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, causticsTexture[i], 0);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    }
+
+    unsigned int gaussianbuffer[2];
+    unsigned int gaussianTexture[2];
+    for (int i = 0; i < 2; i++)
+    {
+        glGenFramebuffers(1, &gaussianbuffer[i]);
+        glBindFramebuffer(GL_FRAMEBUFFER, gaussianbuffer[i]);
+        glGenTextures(1, &gaussianTexture[i]);
+        glBindTexture(GL_TEXTURE_2D, gaussianTexture[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1920, 1080, 0, GL_RGB, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gaussianTexture[i], 0);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     }
@@ -344,13 +366,15 @@ int Application::Run()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     GLFWwindow* window = state.GetWindow().GetGLFWWindow();
-    glEnable(GL_DEPTH_TEST);
+    
     /* Loop until the user closes the window */
     int i = 0;
     
     
     GLenum err;
-    
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     while (!glfwWindowShouldClose(window))
     {
@@ -358,8 +382,6 @@ int Application::Run()
         float deltaTime = state.GetDeltaTime();
         processInput();
         
-        
-
         glm::mat4 proj = state.GetProjectionMatrix();
         glm::mat4 view = camera.GetViewMatrix();
 
@@ -388,17 +410,14 @@ int Application::Run()
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         wave.Use();
         wave.SetMat4("projection", proj);
         wave.SetMat4("view", view);
         wave.SetMat4("model", plane.GetModelMatrix());
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
-        glBeginQuery(GL_SAMPLES_PASSED, query);
         plane.Draw();
-        glEndQuery(GL_SAMPLES_PASSED);
-        glGetQueryObjectiv(query, GL_QUERY_RESULT, &nSamples);
-        std::cout << nSamples << std::endl;
+        
        
 
 
@@ -420,6 +439,9 @@ int Application::Run()
             glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
             plane.Draw();
         }
+
+
+
         skybox.Draw(proj, view);
 
 
@@ -429,7 +451,9 @@ int Application::Run()
         // Debug UI
         glDisable(GL_DEPTH_TEST);
         displayTexture.Use();
-        glBindTexture(GL_TEXTURE_2D, positionsTexture[1 - i]);
+        /*glBindTexture(GL_TEXTURE_2D, gaussianTexture[1 - i]);
+        quad.Draw();*/
+        glBindTexture(GL_TEXTURE_2D, gaussianTexture[1 - i]);
         debugdlQuad.Draw();
         glBindTexture(GL_TEXTURE_2D, normalsTexture[1 - i]);
         debugddQuad.Draw();
@@ -437,6 +461,8 @@ int Application::Run()
         debugQuad.Draw();
         glBindTexture(GL_TEXTURE_2D, causticsTexture[1 - i]);
         debuglQuad.Draw();
+        
+        
 
 
         
@@ -450,7 +476,7 @@ int Application::Run()
         // positions 
         glBindFramebuffer(GL_FRAMEBUFFER, positionsbuffer[i]);
         glEnable(GL_DEPTH_TEST);
-        glClearColor(0, 0, 0, 1);
+        glClearColor(1, 1, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         positions.Use();
         positions.SetMat4("projection", state.GetOrthogonalMatrix());
@@ -472,7 +498,6 @@ int Application::Run()
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         plane.Draw();
 
-
         //wave positions
         glBindFramebuffer(GL_FRAMEBUFFER, wavePositionsbuffer[i]);
         glEnable(GL_DEPTH_TEST);
@@ -486,17 +511,18 @@ int Application::Run()
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer[1 - i]);
         plane.Draw();
 
-        glViewport(0, 0, 5000, 5000);
+        //caustics
         glBindFramebuffer(GL_FRAMEBUFFER, causticsbuffer[i]);
         glEnable(GL_DEPTH_TEST);
-        glClearColor(0, 0, 0, 1);
+        glClearColor(0.0f, 0.0f, 0.0f, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         caustics.Use();
         caustics.SetMat4("projection", state.GetOrthogonalMatrix());
         caustics.SetMat4("view", light.GetViewMatrix());
         caustics.SetMat4("model", glm::mat4(1.0f));
         caustics.SetVec3("light.dir", light.GetDirection());
-        caustics.SetVec3("light.pos", light.GetPosition());
+        //caustics.SetInt("v", nSamples);
+        //caustics.SetVec3("light.pos", glm::vec3(0.0f, 2.0f, 0.0f));
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, positionsTexture[1 - i]);
         glActiveTexture(GL_TEXTURE1);
@@ -505,6 +531,15 @@ int Application::Run()
         glBindTexture(GL_TEXTURE_2D, wavePositionsTexture[1 - i]);
         grid.Draw();
         glActiveTexture(GL_TEXTURE0);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, gaussianbuffer[i]);
+        glEnable(GL_DEPTH_TEST);
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        lowpass.Use();
+        lowpass.SetVec2("texelSize", glm::vec2(1.0f / 1920.0f, 1.0f / 1080.0f));
+        glBindTexture(GL_TEXTURE_2D, causticsTexture[1 - i]);
+        quad.Draw();
 
 
         i = 1 - i;
