@@ -12,6 +12,7 @@
 #include "Crosshair.h"
 #include "Skybox.h"
 #include "Light.h"
+#include "RenderTarget.h"
 
 class Application
 {

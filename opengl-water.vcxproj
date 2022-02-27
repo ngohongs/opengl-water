@@ -145,6 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Cubemap.cpp" />
+    <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Crosshair.cpp" />
@@ -159,6 +161,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\Cubemap.h" />
     <ClInclude Include="inc\Crosshair.h" />
     <ClInclude Include="inc\Application.h" />
     <ClInclude Include="inc\Cube.h" />
@@ -172,6 +175,7 @@
     <ClInclude Include="inc\PlaneGenerator.h" />
     <ClInclude Include="inc\Skybox.h" />
     <ClInclude Include="inc\Light.h" />
+    <ClInclude Include="inc\RenderTarget.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\caustics.frag" />
@@ -194,6 +198,9 @@
     <None Include="shaders\normaldisplay.frag" />
     <None Include="shaders\normaldisplay.geom" />
     <None Include="shaders\normaldisplay.vert" />
+    <None Include="shaders\normalmap.frag" />
+    <None Include="shaders\normalmap.geom" />
+    <None Include="shaders\normalmap.vert" />
     <None Include="shaders\normals.frag" />
     <None Include="shaders\normals.geom" />
     <None Include="shaders\normals.vert" />

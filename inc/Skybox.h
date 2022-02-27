@@ -13,6 +13,7 @@ class Skybox
 public:
 	Skybox(const char** faces);
 	void Draw(const glm::mat4& proj, const glm::mat4& view);
+	GLuint GetTexture() const;
 private:
 	GLuint m_Cubemap;
 	Geometry m_Cube;

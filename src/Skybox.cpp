@@ -1,4 +1,5 @@
 #include "Skybox.h"
+#include "..\inc\Skybox.h"
 
 Skybox::Skybox(const char** faces)
 {
@@ -44,4 +45,9 @@ void Skybox::Draw(const glm::mat4& proj, const glm::mat4& view)
     m_Cube.Bind();
     m_Cube.Draw();
     glDepthFunc(GL_LESS);
+}
+
+GLuint Skybox::GetTexture() const
+{
+    return m_Cubemap;
 }

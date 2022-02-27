@@ -27,6 +27,10 @@ const float ETA = 1.00 / 1.33;
 
 flat out int valid;
 
+uniform int v;
+
+out float fi;
+
 vec3 EstimateIntersection(vec3 v, vec3 r) {
 	vec3 p1 = v + 1.0 * r;
 	vec4 texPt = projection * view * vec4(p1, 1.0);
@@ -55,5 +59,6 @@ void main()
 	else
 		valid = 1;
 
+	fi = dot(-incidentLight, refractiveNormal);
     gl_Position = projection * view * model * vec4(p, 1.0);
 }   

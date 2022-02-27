@@ -51,6 +51,12 @@
     <ClCompile Include="src\Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Cubemap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Shader.h">
@@ -92,6 +98,12 @@
     <ClInclude Include="inc\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\RenderTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Cubemap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\gen.vert" />
@@ -131,6 +143,9 @@
     <None Include="shaders\reciever.frag" />
     <None Include="shaders\lowpass.vert" />
     <None Include="shaders\lowpass.frag" />
+    <None Include="shaders\normalmap.vert" />
+    <None Include="shaders\normalmap.geom" />
+    <None Include="shaders\normalmap.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\caustics.vert" />

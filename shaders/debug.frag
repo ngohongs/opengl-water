@@ -16,6 +16,10 @@ void main()
 		if (g < 0)
 			fragColor = vec4(0, 0, -g, 1);
 	}
-	else
-		fragColor = vec4(r, 0, 0, 1);
+	else {
+		if (r >= 0)
+			fragColor = vec4(r, 0, 0, 1);
+		else
+			fragColor = vec4(-r,-r,-r,1);
+	}
 }

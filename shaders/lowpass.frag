@@ -58,6 +58,44 @@ vec4 BoxBlur(vec2 pos) {
     return sum;
 }
 
+/*vec4 lBoxBlur(vec2 pos) {
+    vec2 px = vec2(texelSize.x, 0);
+    vec2 nx = vec2(-texelSize.x, 0);
+    vec2 py = vec2(0, texelSize.y);
+    vec2 ny = vec2(0, -texelSize.y);
+
+    int res = 10;
+    vec4 sum;
+    for (int i = 0; i < res; i++) {
+        for (int j = 0; j < res; j++) {
+            sum += texture(tex, pos + i * )
+        }
+    }
+    vec2 pxpy = vec2(texelSize.x, texelSize.y);
+    vec2 nxpy = vec2(-texelSize.x, texelSize.y);
+    vec2 pxny = vec2(texelSize.x, -texelSize.y);
+    vec2 nxny = vec2(-texelSize.x, -texelSize.y);
+    vec2 px = vec2(texelSize.x, 0);
+    vec2 nx = vec2(-texelSize.x, 0);
+    vec2 py = vec2(0, texelSize.y);
+    vec2 ny = vec2(0, -texelSize.y);
+
+    vec4 vpxpy = texture(tex, pos + pxpy);
+    vec4 vpxny = texture(tex, pos + pxny);
+    vec4 vnxpy = texture(tex, pos + nxpy);
+    vec4 vnxny = texture(tex, pos + nxny);
+    vec4 vpx = texture(tex, pos + px);
+    vec4 vpy = texture(tex, pos + py);
+    vec4 vnx = texture(tex, pos + nx);
+    vec4 vny = texture(tex, pos + ny);
+
+    vec4 c = texture(tex, pos);
+
+    vec4 sum =  c + (vpx + vpy + vnx + vny) + (vpxpy + vpxny + vnxpy + vnxny);
+    sum = sum / 9.0f;
+    return sum;
+}*/
+
 
 void main()
 {
