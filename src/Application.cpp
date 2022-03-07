@@ -123,6 +123,9 @@ int Application::Run()
     if (!Init())
         return -1;
 
+    int width = state.GetWindow().GetWidth();
+    int height = state.GetWindow().GetHeight();
+
     Shader gen;
     std::cout << gen.AttachShader(VERTEX, "shaders/gen.vert") << std::endl;
     std::cout << gen.AttachShader(FRAGMENT, "shaders/gen.frag") << std::endl;
@@ -202,7 +205,7 @@ int Application::Run()
     std::cout << lowpass.AttachShader(FRAGMENT, "shaders/lowpass.frag") << std::endl;
     std::cout << lowpass.LinkProgram() << std::endl;
 
-    int res = 500;
+    int res = 50;
 
     std::vector<Vertex> planeVert;
     std::vector<unsigned int> planeInd;
@@ -218,7 +221,7 @@ int Application::Run()
     plane2.SetScale(glm::vec3(1.0f));
 
     planeVert.clear();
-    PlaneGenerator().GenerateGrid(1920, 1080, planeVert);
+    PlaneGenerator().GenerateGrid(width, height, planeVert);
     Geometry grid;
     grid.LoadGrid(planeVert);
 
@@ -247,25 +250,17 @@ int Application::Run()
         glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f));
 
 
-    int width = state.GetWindow().GetWidth();
-    int height = state.GetWindow().GetHeight();
+   
 
 
-    RenderTarget heightField[2] = { {res, res, COLOR}, {res, res, COLOR} };
-    RenderTarget receiverPositions = {width, height, COLOR_RENDERBUFFER};
-    RenderTarget refractiveNormals = {width, height, COLOR};
-    RenderTarget wavePositions = {width, height, COLOR};
-    RenderTarget causticMap = {width, height, COLOR};
-    RenderTarget surfaceRefraction = {width * 3, height * 3, COLOR_RENDERBUFFER};
-    RenderTarget normalMap = { res, res, COLOR_RENDERBUFFER, LINEAR };
-    RenderTarget boxBlur = { res, res, COLOR, LINEAR };
-
-    GLuint query;
-    glGenQueries(1, &query);
-    std::cout << "q: " << query << std::endl;
-    int nSamples = 0;
-    int queryReady = 0;
-    bool inUse = false;
+    RenderTarget heightField[2] = { {res, res, COLOR, LINEAR}, {res, res, COLOR, LINEAR} };
+    RenderTarget receiverPositions = {width, height, COLOR_RENDERBUFFER, NEAREST};
+    RenderTarget refractiveNormals = {width, height, COLOR, NEAREST};
+    RenderTarget wavePositions = {width, height, COLOR, NEAREST};
+    RenderTarget causticMap = {width, height, COLOR, NEAREST};
+    RenderTarget surfaceRefraction = {width, height, COLOR_RENDERBUFFER, NEAREST};
+    RenderTarget normalMap = { res, res, COLOR_RENDERBUFFER, NEAREST };
+    RenderTarget boxBlur = { res, res, COLOR, NEAREST };
 
     Camera& camera = state.GetCamera();
 

@@ -60,22 +60,22 @@ void main()
     float old_v = old_info.g;
 
     
-    float c = 0.026;
+    float c = 0.03;
     float h = texelSize;
     float f = c * c * (nsum - 4 * old_u) / (h * h);
     float new_v = old_v + f * deltaTime;
-    new_v = new_v * 0.997;
+    //new_v = new_v * 0.99;
     float new_u = old_u + new_v * deltaTime; 
     new_u = new_u + heightWithDrop(texCoord);
 
     float offset = average - new_u;
-    float maxSlope = 100;
+    float maxSlope = 50;
     float maxOffset = maxSlope * h;
 
-    //if (offset > maxOffset) 
-      //  new_u = new_u + offset - maxOffset;
-    //if (offset < -maxOffset)
-        //new_u = new_u + offset + maxOffset;
+    if (offset > maxOffset) 
+        new_u = new_u + offset - maxOffset;
+    if (offset < -maxOffset)
+        new_u = new_u + offset + maxOffset;
 
     vec4 new_info = vec4(new_u , new_v, 0, 1);
 

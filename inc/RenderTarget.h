@@ -18,7 +18,7 @@ class RenderTarget
 {
 public:
 	RenderTarget(const int& width, const int& height);
-	RenderTarget(const int& width, const int& height, const RTType& type, const RTTextureFilter& filter = RTTextureFilter::NEAREST);
+	RenderTarget(const int& width, const int& height, const RTType& type, const RTTextureFilter& filter = RTTextureFilter::LINEAR);
 	void AttachColor(RTTextureFilter filter = RTTextureFilter::LINEAR);
 	void AttachDepth(RTTextureFilter filter = RTTextureFilter::LINEAR);
 	void AttachRenderBuffer();
