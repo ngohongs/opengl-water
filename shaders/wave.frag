@@ -26,7 +26,7 @@ vec2 calculateRefractUV(vec3 normal) {
     vec3 finalDir = normalize(viewDir + refractDir); // 
     vec4 clipSpaceDir = projection * view * vec4(finalDir, 1.0);
     vec2 texC = 0.5 * (clipSpaceDir.xy/clipSpaceDir.w) + 0.5;
-    return texC;
+    return 1.2 * texC;
 }
 
 void main()
@@ -71,7 +71,7 @@ void main()
     float n2 = 1.33f;
 
     float rs = ((n1*ci-n2*ct)/(n1*ci+n2*ct)) * ((n1*ci-n2*ct)/(n1*ci+n2*ct));
-    float rp = ((n1*ct-n2*ci)/(n1*ct+n2*ci)) * ((n1*ct-n2*ci)/(n1*ct+n2*ci));
+    float rp = ((n2*ct-n1*ci)/(n2*ct+n1*ci)) * ((n2*ct-n1*ci)/(n2*ct+n1*ci));
 
     float rc = 1 - (rs+rp) / 2;
     float fresnel = dot(normalize(toCameraDir), normal);
