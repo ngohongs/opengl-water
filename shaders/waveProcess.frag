@@ -7,6 +7,8 @@ uniform bool drop;
 uniform vec2 dropPos;
 uniform float deltaTime;
 
+const float PI = 3.14159265359;
+
 float heightWithDrop(vec2 pos)
 {
     if (!drop)
@@ -17,9 +19,12 @@ float heightWithDrop(vec2 pos)
 
 float height(vec2 pos)
 {
-	float drop = max(0.0, 1.0 - length( pos - dropPos ) / 0.06);
-	drop = 0.5 - cos(drop*3.1415926535899793)*0.5;
-    return drop;
+    if (!drop)
+        return 0.0;
+    float radius = 4 * texelSize;
+	float val = max(0.0, 1.0 - length(dropPos - pos) / radius);
+    val = 0.5 - cos(val * PI) * 0.5;
+    return 0.5 * val;
 }
 
 
@@ -54,28 +59,42 @@ void main()
     float new_u = old_u + new_v;
     */
 
-    
 
-    float old_u = old_info.r;
+    
+    float h = texelSize;
+    float old_u = old_info.r;// + height(texCoord);
     float old_v = old_info.g;
 
+
+    float offset = average - old_u;
+    float maxslope = 0.3;
+    float maxoffset = maxslope * h;
+
+    if (offset > maxoffset) 
+        old_u = old_u + offset - maxoffset;
+    if (offset < -maxoffset)
+        old_u = old_u + offset + maxoffset;
+
+
+
+  
     
-    float c = 0.03;
-    float h = texelSize;
+    float c = 0.2f;
     float f = c * c * (nsum - 4 * old_u) / (h * h);
     float new_v = old_v + f * deltaTime;
-    //new_v = new_v * 0.99;
+    new_v = new_v - old_u;
+    new_v = new_v;
     float new_u = old_u + new_v * deltaTime; 
-    new_u = new_u + heightWithDrop(texCoord);
+    new_u = new_u;
 
-    float offset = average - new_u;
-    float maxSlope = 50;
-    float maxOffset = maxSlope * h;
-
-    if (offset > maxOffset) 
-        new_u = new_u + offset - maxOffset;
-    if (offset < -maxOffset)
-        new_u = new_u + offset + maxOffset;
+//    float offset = average - new_u;
+//    float maxslope = 10000;
+//    float maxoffset = maxslope * h;
+//
+//    if (offset > maxoffset) 
+//        new_u = new_u + offset - maxoffset;
+//    if (offset < -maxoffset)
+//        new_u = new_u + offset + maxoffset;
 
     vec4 new_info = vec4(new_u , new_v, 0, 1);
 

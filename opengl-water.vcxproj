@@ -185,6 +185,8 @@
     <None Include="shaders\debug.vert" />
     <None Include="shaders\displaytexture.frag" />
     <None Include="shaders\displaytexture.vert" />
+    <None Include="shaders\drop.frag" />
+    <None Include="shaders\drop.vert" />
     <None Include="shaders\force.frag" />
     <None Include="shaders\force.vert" />
     <None Include="shaders\gen.frag" />

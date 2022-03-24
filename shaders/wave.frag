@@ -11,6 +11,7 @@ uniform mat4 model;
 
 uniform float texelSize;
 
+
 layout(binding=0) uniform sampler2D tex;
 layout(binding=1) uniform samplerCube environment;
 layout(binding=2) uniform sampler2D belowSurface;
@@ -51,17 +52,29 @@ void main()
 
     normal = normalize(mat3(transpose(inverse(model))) * normal);
 
+    if (cameraPosition.y < fPosition.y)
+        normal = -normal;
 
     vec3 viewDir = normalize(fPosition - cameraPosition);
-    vec3 reflectDir = reflect(viewDir, normal);
-    vec3 refractDir = refract(viewDir, normal, eta);
+    vec3 reflectDir = normalize(reflect(viewDir, normal));
+    vec3 refractDir = normalize(refract(viewDir, normal, eta));
 
     vec4 reflectColor = texture(environment, reflectDir);
    // vec4 refractColor = texture(environment, refractDir);
     vec4 refractColor = texture(belowSurface, calculateRefractUV(normal));
 
 
+    float ci = dot(normal, viewDir);
+    float ct = dot(normal, refractDir);
+
+    float n1 = 1.00f;
+    float n2 = 1.33f;
+
+    float rs = ((n1*ci-n2*ct)/(n1*ci+n2*ct)) * ((n1*ci-n2*ct)/(n1*ci+n2*ct));
+    float rp = ((n1*ct-n2*ci)/(n1*ct+n2*ci)) * ((n1*ct-n2*ci)/(n1*ct+n2*ci));
+
+    float rc = 1 - (rs+rp) / 2;
     float fresnel = dot(normalize(toCameraDir), normal);
-    vec4 color = mix(reflectColor, refractColor, fresnel);
+    vec4 color = mix(reflectColor, refractColor, rc);
     FragColor = color;
 }

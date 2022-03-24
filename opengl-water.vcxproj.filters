@@ -146,6 +146,8 @@
     <None Include="shaders\normalmap.vert" />
     <None Include="shaders\normalmap.geom" />
     <None Include="shaders\normalmap.frag" />
+    <None Include="shaders\drop.vert" />
+    <None Include="shaders\drop.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\caustics.vert" />

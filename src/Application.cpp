@@ -131,10 +131,10 @@ int Application::Run()
     std::cout << gen.AttachShader(FRAGMENT, "shaders/gen.frag") << std::endl;
     std::cout << gen.LinkProgram() << std::endl;
 
-    Shader force;
-    std::cout << force.AttachShader(VERTEX, "shaders/force.vert") << std::endl;
-    std::cout << force.AttachShader(FRAGMENT, "shaders/force.frag") << std::endl;
-    std::cout << force.LinkProgram() << std::endl;
+    Shader drop;
+    std::cout << drop.AttachShader(VERTEX, "shaders/drop.vert") << std::endl;
+    std::cout << drop.AttachShader(FRAGMENT, "shaders/drop.frag") << std::endl;
+    std::cout << drop.LinkProgram() << std::endl;
 
     Shader debug;
     std::cout << debug.AttachShader(VERTEX, "shaders/debug.vert") << std::endl;
@@ -146,16 +146,6 @@ int Application::Run()
     std::cout << displayTexture.AttachShader(FRAGMENT, "shaders/displaytexture.frag") << std::endl;
     std::cout << displayTexture.LinkProgram() << std::endl;
 
-    Shader test;
-    std::cout << test.AttachShader(VERTEX, "shaders/test.vert") << std::endl;
-    std::cout << test.AttachShader(FRAGMENT, "shaders/test.frag") << std::endl;
-    std::cout << test.LinkProgram() << std::endl;
-
-
-    Shader pass;
-    std::cout << pass.AttachShader(VERTEX, "shaders/pass.vert") << std::endl;
-    std::cout << pass.AttachShader(FRAGMENT, "shaders/pass.frag") << std::endl;
-    std::cout << pass.LinkProgram() << std::endl;
 
     Shader wave;
     std::cout << wave.AttachShader(VERTEX, "shaders/wave.vert") << std::endl;
@@ -205,7 +195,7 @@ int Application::Run()
     std::cout << lowpass.AttachShader(FRAGMENT, "shaders/lowpass.frag") << std::endl;
     std::cout << lowpass.LinkProgram() << std::endl;
 
-    int res = 50;
+    int res = 64;
 
     std::vector<Vertex> planeVert;
     std::vector<unsigned int> planeInd;
@@ -254,6 +244,7 @@ int Application::Run()
 
 
     RenderTarget heightField[2] = { {res, res, COLOR, LINEAR}, {res, res, COLOR, LINEAR} };
+    RenderTarget dropped = {res, res, COLOR, LINEAR};
     RenderTarget receiverPositions = {width, height, COLOR_RENDERBUFFER, NEAREST};
     RenderTarget refractiveNormals = {width, height, COLOR, NEAREST};
     RenderTarget wavePositions = {width, height, COLOR, NEAREST};
@@ -287,6 +278,18 @@ int Application::Run()
         glm::mat4 view = camera.GetViewMatrix();
 
 
+        //Drop
+        dropped.Bind();
+            glEnable(GL_DEPTH_TEST);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            drop.Use();
+            drop.SetFloat("texelSize", 1.0f / (float)res);
+            drop.SetVec2("dropPos", state.GetDropPos());
+            drop.SetBool("drop", state.GetDropTest());
+            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
+            quad.Draw();
+            state.SetDropTest(false);
+        dropped.Unbind();
 
 
         // Shallow water calc
@@ -295,10 +298,10 @@ int Application::Run()
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             waveProcess.Use();
             waveProcess.SetFloat("texelSize", 1.0f / (float)res);
-            waveProcess.SetVec2("dropPos", state.GetDropPos());
-            waveProcess.SetBool("drop", state.GetDropTest());
+            //waveProcess.SetVec2("dropPos", state.GetDropPos());
+            //waveProcess.SetBool("drop", state.GetDropTest());
             waveProcess.SetFloat("deltaTime", deltaTime);
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
+            glBindTexture(GL_TEXTURE_2D, dropped.GetColor());
             quad.Draw();
             state.SetDropTest(false);
         heightField[i].Unbind();
