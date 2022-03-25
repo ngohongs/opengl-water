@@ -61,7 +61,7 @@ void main()
 
     vec4 reflectColor = texture(environment, reflectDir);
    // vec4 refractColor = texture(environment, refractDir);
-    vec4 refractColor = texture(belowSurface, calculateRefractUV(normal));
+    vec4 refractColor = mix(texture(belowSurface, calculateRefractUV(normal)), vec4(0,0,1,1), cameraPosition.y / 5);
 
 
     float ci = dot(normal, viewDir);
