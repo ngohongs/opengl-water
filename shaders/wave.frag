@@ -61,7 +61,7 @@ void main()
 
     vec4 reflectColor = texture(environment, reflectDir);
    // vec4 refractColor = texture(environment, refractDir);
-    vec4 refractColor = mix(texture(belowSurface, calculateRefractUV(normal)), vec4(0,0,1,1), cameraPosition.y / 5);
+    vec4 refractColor = texture(belowSurface, calculateRefractUV(normal));
 
 
     float ci = dot(normal, viewDir);
@@ -76,5 +76,5 @@ void main()
     float rc = 1 - (rs+rp) / 2;
     float fresnel = dot(normalize(toCameraDir), normal);
     vec4 color = mix(reflectColor, refractColor, rc);
-    FragColor = color;
+    FragColor = mix(reflectColor, vec4(1, 1, 1, 0.15), rc);
 }

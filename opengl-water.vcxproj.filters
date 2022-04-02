@@ -112,8 +112,8 @@
     <None Include="shaders\crosshair.frag" />
     <None Include="shaders\height.frag" />
     <None Include="shaders\height.vert" />
-    <None Include="shaders\force.vert" />
-    <None Include="shaders\force.frag" />
+    <None Include="shaders\uv.vert" />
+    <None Include="shaders\uv.frag" />
     <None Include="shaders\wave.vert" />
     <None Include="shaders\wave.frag" />
     <None Include="shaders\debug.vert" />
@@ -137,15 +137,13 @@
     <None Include="shaders\displaytexture.frag" />
     <None Include="shaders\normals.vert" />
     <None Include="shaders\normals.frag" />
-    <None Include="shaders\normals.geom" />
     <None Include="shaders\caustics.frag" />
     <None Include="shaders\reciever.vert" />
     <None Include="shaders\reciever.frag" />
     <None Include="shaders\lowpass.vert" />
     <None Include="shaders\lowpass.frag" />
-    <None Include="shaders\normalmap.vert" />
-    <None Include="shaders\normalmap.geom" />
-    <None Include="shaders\normalmap.frag" />
+    <None Include="shaders\reflections.vert" />
+    <None Include="shaders\reflections.frag" />
     <None Include="shaders\drop.vert" />
     <None Include="shaders\drop.frag" />
   </ItemGroup>

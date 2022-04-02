@@ -12,22 +12,35 @@ uniform bool wave;
 
 uniform sampler2D tex;
 
+uniform bool inView;
 
 void main()
 {
-    vec4 pos;
-    vec4 color;
-    if (wave) {
-        float height = texture(tex, texCoord).r;
-        vec3 offset = vec3(0.0, height, 0.0);
 
-        pos = projection * view * model * vec4(aPos + offset, 1.0);
-        color = model * vec4(aPos + offset, 1.0);
+    float height = texture(tex, texCoord).r;
+    vec3 offset = vec3(0.0, height, 0.0);
+
+
+    vec4 position; 
+
+    if (wave)
+    {
+        position = vec4(aPos + offset, 1.0);
+    }
+    else
+    {
+        position = vec4(aPos, 1.0);
+    }
+
+    vec4 worldc = model * position;
+    vec4 viewc = view * worldc;
+    vec4 projc = projection * viewc;
+
+    if (inView) { 
+        fPos = viewc;
     }
     else {
-        pos = projection * view * model * vec4(aPos, 1.0);
-        color = model * vec4(aPos, 1.0);
+        fPos = worldc;
     }
-    fPos = color;
-    gl_Position = pos;
+    gl_Position = projc;
 }   

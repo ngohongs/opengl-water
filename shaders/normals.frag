@@ -11,6 +11,9 @@ uniform mat4 model;
 uniform sampler2D tex;
 uniform float texelSize;
 
+uniform bool wave;
+
+uniform bool inView;
 
 void main()
 {   
@@ -26,13 +29,21 @@ void main()
     float b = texture(tex, fTexCoord + ny).r;
     float m = texture(tex, fTexCoord).r;
 
-    vec3 hor = vec3(2 * texelSize ,r - l,0);
-    vec3 ver = vec3(0,t - b,2 * texelSize);
+    vec3 normal;
 
-    //vec3 normal = normalize(texture(normalMap, fTexCoord).xyz);
-
-    vec3 normal = normalize(cross(ver, hor));
-
-    normal = normalize(mat3(transpose(inverse(model))) * normal);
+    if (wave) {
+        vec3 hor = vec3(2 * texelSize ,r - l,0);
+        vec3 ver = vec3(0,t - b,2 * texelSize);
+        normal = normalize(cross(ver, hor));
+    }
+    else {
+        normal = normalize(fNormal);
+    }
+    if (inView) {
+        normal = normalize(mat3(transpose(inverse(view * model))) * normal);
+    }
+    else {
+        normal = normalize(mat3(transpose(inverse(model))) * normal);
+    }
     FragColor = vec4(normal, 1.0);
 }

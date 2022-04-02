@@ -54,7 +54,7 @@ void main()
 
 	vec3 p = EstimateIntersection(refractivePosition, refractedLight);
 
-	if (distance(refractiveNormal, vec3(0)) < 0.001 || p.xyz == vec3(1.0f))
+	if (distance(refractiveNormal, vec3(0)) < 0.001 || p.xyz == vec3(1.0f) || dot(p - refractivePosition, refractedLight) < 0.1)
 		valid = 0;
 	else
 		valid = 1;

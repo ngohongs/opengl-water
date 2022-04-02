@@ -99,5 +99,5 @@ vec4 BoxBlur(vec2 pos) {
 
 void main()
 {
-    color = GaussianBlur(fTexCoord);
+    color = BoxBlur(fTexCoord);
 }  

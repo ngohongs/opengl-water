@@ -88,6 +88,7 @@ bool Shader::LinkProgram()
 		}
 	}
 	
+	std::cout << "LINK success " << m_ID << std::endl;
 	return true;
 }
 
@@ -101,7 +102,7 @@ void Shader::SetBool(const std::string& name, bool value) const
 	GLint location = glGetUniformLocation(m_ID, name.c_str());
 	glUniform1i(location, (int)value);
 	if (location == -1)
-		std::cout << "ERROR\n";
+		std::cout << m_ID << " " + name + " ERROR\n";
 }
 
 void Shader::SetInt(const std::string& name, int value) const
@@ -109,7 +110,7 @@ void Shader::SetInt(const std::string& name, int value) const
 	GLint location = glGetUniformLocation(m_ID, name.c_str());
 	glUniform1i(location, value);
 	if (location == -1)
-		std::cout << "ERROR\n";
+		std::cout << m_ID << " " + name + " ERROR\n";
 }
 
 void Shader::SetFloat(const std::string& name, float value) const
@@ -117,7 +118,7 @@ void Shader::SetFloat(const std::string& name, float value) const
 	GLint location = glGetUniformLocation(m_ID, name.c_str());
 	glUniform1f(location, value);
 	if (location == -1)
-		std::cout << "ERROR\n";
+		std::cout << m_ID << " " + name + " ERROR\n";
 }
 
 void Shader::SetVec2(const std::string& name, glm::vec2 value) const
@@ -125,14 +126,14 @@ void Shader::SetVec2(const std::string& name, glm::vec2 value) const
 	GLint location = glGetUniformLocation(m_ID, name.c_str());
 	glUniform2fv(location, 1, &value[0]);
 	if (location == -1)
-		std::cout << "ERROR\n";
+		std::cout << m_ID << " " + name + " ERROR\n";
 }
 
 void Shader::SetVec3(const std::string& name, glm::vec3 value) const
 {
 	GLint location = glGetUniformLocation(m_ID, name.c_str());
 	if (location == -1)
-		std::cout << "ERROR\n";
+		std::cout << m_ID << " " + name + " ERROR\n";
 	glUniform3fv(location, 1, &value[0]);
 }
 
@@ -141,7 +142,7 @@ void Shader::SetVec4(const std::string& name, glm::vec4 value) const
 	GLint location = glGetUniformLocation(m_ID, name.c_str());
 	glUniform4fv(location, 1, &value[0]);
 	if (location == -1)
-		std::cout << "ERROR\n";
+		std::cout << m_ID << " " + name + " ERROR\n";
 }
 
 void Shader::SetMat4(const std::string& name, const glm::mat4& value) const
@@ -149,5 +150,5 @@ void Shader::SetMat4(const std::string& name, const glm::mat4& value) const
 	GLint location = glGetUniformLocation(m_ID, name.c_str());
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	if (location == -1)
-		std::cout << "ERROR\n";
+		std::cout << m_ID << " " + name + " ERROR\n";
 }
