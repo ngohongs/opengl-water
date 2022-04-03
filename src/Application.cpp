@@ -172,6 +172,13 @@ int Application::Run()
     std::cout << reciever.AttachShader(FRAGMENT, "shaders/reciever.frag") << std::endl;
     std::cout << "reciever " << reciever.LinkProgram() << std::endl;
 
+    Shader depth;
+    std::cout << depth.AttachShader(VERTEX, "shaders/depth.vert") << std::endl;
+    std::cout << depth.AttachShader(FRAGMENT, "shaders/depth.frag") << std::endl;
+    std::cout << "depth " << depth.LinkProgram() << std::endl;
+
+    std::cout << "----" << std::endl;
+        
     int res = 64;
 
     std::vector<Vertex> planeVert;
@@ -213,6 +220,7 @@ int Application::Run()
             "resources/skybox/back.jpg"
         };
 
+
     Skybox skybox(faces);
 
     Light light(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
@@ -229,12 +237,12 @@ int Application::Run()
     RenderTarget wavePositions = {width, height, COLOR, NEAREST};
     RenderTarget causticMap = {width, height, COLOR, LINEAR};
     
-    RenderTarget boxBlur = { width, height, COLOR, LINEAR };
-    RenderTarget scenePositions = { width, height, COLOR_RENDERBUFFER, LINEAR };
-    RenderTarget sceneNormals = { width,height, COLOR_RENDERBUFFER, LINEAR };
+    RenderTarget depthTex = { width, height, COLOR_RENDERBUFFER, LINEAR };
+    RenderTarget refractionColor = { width, height, COLOR_RENDERBUFFER, LINEAR };
+
+    RenderTarget refrPos = { width, height, COLOR_RENDERBUFFER, LINEAR };
 
 
-    RenderTarget reflectionColor = { width, height, COLOR_RENDERBUFFER, LINEAR };
 
     Camera& camera = state.GetCamera();
 
@@ -246,6 +254,7 @@ int Application::Run()
     int i = 0;
     
     
+
     GLenum err;
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -325,17 +334,34 @@ int Application::Run()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTexture());
         glActiveTexture(GL_TEXTURE2);
-        // glBindTexture(GL_TEXTURE_2D, surfaceRefraction.GetColor());
+        glBindTexture(GL_TEXTURE_2D, refrPos.GetColor());
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, refractionColor.GetColor());
         glActiveTexture(GL_TEXTURE0);
+
         plane.Draw();
+        
 
-
-
-
-        reflectionColor.Bind();
+        refrPos.Bind();
             glEnable(GL_DEPTH_TEST);
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            positions.Use();
+            positions.SetMat4("projection", proj);
+            positions.SetMat4("view", view);
+            positions.SetMat4("model", plane2.GetModelMatrix());
+            positions.SetBool("wave", false);
+            positions.SetBool("inView", false);
+            plane2.Draw();
+
+            positions.SetMat4("model", cube.GetModelMatrix());
+            cube.Draw();
+        refrPos.Unbind();
+
+        refractionColor.Bind();
+            glEnable(GL_DEPTH_TEST);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
             reciever.Use();
             reciever.SetMat4("projection", proj);
@@ -349,80 +375,15 @@ int Application::Run()
             reciever.SetMat4("model", cube.GetModelMatrix());
             cube.Draw();
 
-            wave.Use();
-            wave.SetMat4("projection", proj);
-            wave.SetMat4("view", view);
-            wave.SetMat4("model", plane.GetModelMatrix());
-            wave.SetVec3("cameraPosition", camera.GetEye());
-            wave.SetFloat("texelSize", 1.0f / res);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTexture());
-            glActiveTexture(GL_TEXTURE2);
-            // glBindTexture(GL_TEXTURE_2D, surfaceRefraction.GetColor());
-            glActiveTexture(GL_TEXTURE0);
-            plane.Draw();
-        reflectionColor.Unbind();
+            skybox.Draw(proj, view);
+
+        refractionColor.Unbind();
 
 
 
 
 
 
-
-        scenePositions.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            positions.Use();
-
-            positions.SetMat4("projection", proj);
-            positions.SetMat4("view", view);
-            positions.SetMat4("model", plane.GetModelMatrix());
-            positions.SetBool("wave", true);
-            positions.SetBool("inView", true);
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
-            plane.Draw();
-            
-            positions.SetMat4("model", cube.GetModelMatrix());
-            cube.Draw();
-
-            positions.SetMat4("projection", proj);
-            positions.SetMat4("view", view);
-            positions.SetMat4("model", plane2.GetModelMatrix());
-            positions.SetBool("wave", false);
-            positions.SetBool("inView", true);
-            plane2.Draw();
-        scenePositions.Unbind();
-
-        sceneNormals.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            normals.Use();
-
-            normals.SetMat4("projection", proj);
-            normals.SetMat4("view", view);
-            normals.SetMat4("model", plane.GetModelMatrix());
-            normals.SetBool("wave", true);
-            normals.SetBool("inView", true);
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
-            plane.Draw();
-
-            normals.SetBool("wave", false);
-            normals.SetMat4("model", cube.GetModelMatrix());
-            cube.Draw();
-
-            normals.SetBool("wave", false);
-            normals.SetMat4("projection", proj);
-            normals.SetMat4("view", view);
-            normals.SetMat4("model", plane2.GetModelMatrix());
-            normals.SetBool("inView", true);
-            plane2.Draw();
-        sceneNormals.Unbind();
 
 
 
@@ -438,16 +399,16 @@ int Application::Run()
         quad.Draw();*/
         displayTexture.Use();
         //BL
-        glBindTexture(GL_TEXTURE_2D, scenePositions.GetColor());
+        glBindTexture(GL_TEXTURE_2D, refrPos.GetColor());
         debugdlQuad.Draw();
         //BR
-        glBindTexture(GL_TEXTURE_2D, sceneNormals.GetColor());
+        glBindTexture(GL_TEXTURE_2D, refractionColor.GetColor());
         debugddQuad.Draw();
         //TR
-        glBindTexture(GL_TEXTURE_2D, reflectionColor.GetColor());
+        glBindTexture(GL_TEXTURE_2D, depthTex.GetColor());
         debugQuad.Draw();
         //TL
-        glBindTexture(GL_TEXTURE_2D, refractiveNormals.GetColor());
+        glBindTexture(GL_TEXTURE_2D, depthTex.GetColor());
         debuglQuad.Draw();
 
         crosshair.Draw();

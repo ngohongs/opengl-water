@@ -122,8 +122,8 @@
     <None Include="shaders\pass.frag" />
     <None Include="shaders\test.vert" />
     <None Include="shaders\test.frag" />
-    <None Include="shaders\logl.vert" />
-    <None Include="shaders\logl.frag" />
+    <None Include="shaders\reflectioncolored.vert" />
+    <None Include="shaders\reflectioncolored.frag" />
     <None Include="shaders\waveProcess.vert" />
     <None Include="shaders\waveProcess.frag" />
     <None Include="shaders\skybox.vert" />
@@ -142,10 +142,12 @@
     <None Include="shaders\reciever.frag" />
     <None Include="shaders\lowpass.vert" />
     <None Include="shaders\lowpass.frag" />
-    <None Include="shaders\reflections.vert" />
-    <None Include="shaders\reflections.frag" />
+    <None Include="shaders\depth.vert" />
+    <None Include="shaders\depth.frag" />
     <None Include="shaders\drop.vert" />
     <None Include="shaders\drop.frag" />
+    <None Include="shaders\watermask.vert" />
+    <None Include="shaders\watermask.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\caustics.vert" />

@@ -4,6 +4,7 @@ out vec4 FragColor;
 in vec3 fPosition;
 in vec2 fTexCoord;
 in vec3 toCameraDir;
+in vec4 fWorldCoord;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -14,11 +15,15 @@ uniform float texelSize;
 
 layout(binding=0) uniform sampler2D tex;
 layout(binding=1) uniform samplerCube environment;
-layout(binding=2) uniform sampler2D belowSurface;
+
+layout(binding=2) uniform sampler2D positions;
+layout(binding=3) uniform sampler2D color;
+
 
 uniform vec3 cameraPosition;
 
 const float eta = 1.00 / 1.52;
+
 
 vec2 calculateRefractUV(vec3 normal) {
     vec3 viewDir = normalize(fPosition - cameraPosition);
@@ -26,11 +31,26 @@ vec2 calculateRefractUV(vec3 normal) {
     vec3 finalDir = normalize(viewDir + refractDir); // 
     vec4 clipSpaceDir = projection * view * vec4(finalDir, 1.0);
     vec2 texC = 0.5 * (clipSpaceDir.xy/clipSpaceDir.w) + 0.5;
-    return 1.2 * texC;
+    return texC;
 }
 
+vec2 EstimateIntersection(vec3 v, vec3 r) {
+	vec3 p1 = v + 1.0 * r;
+	vec4 texPt = projection * view * vec4(p1, 1.0);
+	vec2 texC = 0.5 * (texPt.xy/texPt.w) + 0.5;
+	vec4 recPos = texture(positions, texC);
+    if (recPos.a <= 0.0f)
+        return vec2(-1.0f);
+	float d = distance(v, recPos.xyz);
+	vec3 p2 = v + d * r;
+	texPt = projection * view * vec4(p2, 1.0);
+	texC = 0.5 * (texPt.xy/texPt.w) + 0.5;
+	return texC;
+}
+
+
 void main()
-{
+{    
     vec2 px = vec2(texelSize, 0);
     vec2 nx = vec2(-texelSize, 0);
     vec2 py = vec2(0, texelSize);
@@ -52,8 +72,8 @@ void main()
 
     normal = normalize(mat3(transpose(inverse(model))) * normal);
 
-    if (cameraPosition.y < fPosition.y)
-        normal = -normal;
+    //if (cameraPosition.y < fPosition.y)
+    //    normal = -normal;
 
     vec3 viewDir = normalize(fPosition - cameraPosition);
     vec3 reflectDir = normalize(reflect(viewDir, normal));
@@ -61,7 +81,16 @@ void main()
 
     vec4 reflectColor = texture(environment, reflectDir);
    // vec4 refractColor = texture(environment, refractDir);
-    vec4 refractColor = texture(belowSurface, calculateRefractUV(normal));
+	//vec4 refractColor = texture(belowSurface, calculateRefractUV(normal));
+    vec2 refractedUV = EstimateIntersection(fWorldCoord.xyz, refractDir);
+    vec4 refractedColor = texture(color, refractedUV);
+    if (refractedUV.x < 0.0f)
+        refractedColor = mix(texture(environment, refractDir), vec4(0.0f), 0.8);
+
+
+	const int maxCount = 500;
+	float stepSize = 0.2f;
+	float maxStepSize = 10.0;
 
 
     float ci = dot(normal, viewDir);
@@ -75,6 +104,6 @@ void main()
 
     float rc = 1 - (rs+rp) / 2;
     float fresnel = dot(normalize(toCameraDir), normal);
-    vec4 color = mix(reflectColor, refractColor, rc);
-    FragColor = mix(reflectColor, vec4(1, 1, 1, 0.15), rc);
+    vec4 color = mix(reflectColor, vec4(120.0f/255.0f, 150.0f/255.0f, 233.0f/255.0f, .3f), rc);
+    FragColor = refractedColor;
 }
