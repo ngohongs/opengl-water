@@ -16,8 +16,13 @@ uniform float texelSize;
 layout(binding=0) uniform sampler2D tex;
 layout(binding=1) uniform samplerCube environment;
 
-layout(binding=2) uniform sampler2D positions;
-layout(binding=3) uniform sampler2D color;
+layout(binding=2) uniform sampler2D positionsRefracted;
+layout(binding=4) uniform sampler2D positionsReflected;
+
+layout(binding=3) uniform sampler2D colorRefracted;
+layout(binding=5) uniform sampler2D colorReflected;
+
+
 
 
 uniform vec3 cameraPosition;
@@ -34,8 +39,8 @@ vec2 calculateRefractUV(vec3 normal) {
     return texC;
 }
 
-vec2 EstimateIntersection(vec3 v, vec3 r) {
-	vec3 p1 = v + 1.0 * r;
+vec2 EstimateIntersection(vec3 v, vec3 r, sampler2D positions) {
+	vec3 p1 = v + 0.3 * r;
 	vec4 texPt = projection * view * vec4(p1, 1.0);
 	vec2 texC = 0.5 * (texPt.xy/texPt.w) + 0.5;
 	vec4 recPos = texture(positions, texC);
@@ -82,16 +87,18 @@ void main()
     vec4 reflectColor = texture(environment, reflectDir);
    // vec4 refractColor = texture(environment, refractDir);
 	//vec4 refractColor = texture(belowSurface, calculateRefractUV(normal));
-    vec2 refractedUV = EstimateIntersection(fWorldCoord.xyz, refractDir);
-    vec4 refractedColor = texture(color, refractedUV);
+    
+	//GOOD ------------------
+	vec2 refractedUV = EstimateIntersection(fWorldCoord.xyz, refractDir, positionsRefracted);
+    vec4 refractedColor = texture(colorRefracted, refractedUV);
     if (refractedUV.x < 0.0f)
-        refractedColor = mix(texture(environment, refractDir), vec4(0.0f), 0.8);
+        refractedColor = mix(texture(environment, refractDir), texture(environment, viewDir), 0.3);
+	//-----------------------
 
-
-	const int maxCount = 500;
-	float stepSize = 0.2f;
-	float maxStepSize = 10.0;
-
+	vec2 reflectedUV = EstimateIntersection(fWorldCoord.xyz, reflectDir, positionsReflected);
+    vec4 reflectedColor = texture(colorReflected, reflectedUV);
+    if (reflectedUV.x < 0.0f)
+        reflectedColor = texture(environment, reflectDir);
 
     float ci = dot(normal, viewDir);
     float ct = dot(normal, refractDir);
@@ -105,5 +112,5 @@ void main()
     float rc = 1 - (rs+rp) / 2;
     float fresnel = dot(normalize(toCameraDir), normal);
     vec4 color = mix(reflectColor, vec4(120.0f/255.0f, 150.0f/255.0f, 233.0f/255.0f, .3f), rc);
-    FragColor = refractedColor;
+    FragColor = mix(reflectedColor, refractedColor, rc);
 }
