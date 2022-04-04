@@ -50,6 +50,9 @@ vec2 EstimateIntersection(vec3 v, vec3 r, sampler2D positions) {
 	vec3 p2 = v + d * r;
 	texPt = projection * view * vec4(p2, 1.0);
 	texC = 0.5 * (texPt.xy/texPt.w) + 0.5;
+
+    if (texC.x < 0 || texC.x > 1 || texC.y < 0 || texC.y > 1)
+        return vec2(-1.0f);
 	return texC;
 }
 

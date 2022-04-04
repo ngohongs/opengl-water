@@ -9,6 +9,8 @@ uniform float deltaTime;
 
 const float PI = 3.14159265359;
 
+uniform bool abort;
+
 float heightWithDrop(vec2 pos)
 {
     if (!drop)
@@ -30,7 +32,10 @@ float height(vec2 pos)
 
 void main()
 {
-    
+    if (abort) {
+        FragColor = vec4(vec3(0.0), 1.0);
+        return;
+    }
     vec2 texCoord = UV;
     vec4 old_info = texture(tex, texCoord);
 

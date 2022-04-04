@@ -16,6 +16,9 @@ State::State(const int& width, const int& height)
 	m_LastTime = 0;
 	m_DeltaTime = 0;
 	m_DropTest = false;
+	m_Abort = false;
+	for (auto& i : m_KeyMap)
+		i = false;
 }
 
 int State::Init()
@@ -65,6 +68,16 @@ void State::SetDropTest(const bool& q)
 bool State::GetDropTest() const
 {
 	return m_DropTest;
+}
+
+void State::SetAbort(const bool& q)
+{
+	m_Abort = q;
+}
+
+bool State::GetAbort() const
+{
+	return m_Abort;
 }
 
 bool State::GetNormalDisplay() const

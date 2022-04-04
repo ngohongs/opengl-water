@@ -7,6 +7,8 @@ extern void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 extern void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 extern void processInput();
 
+enum { M1, KEY_COUNT };
+
 class State
 {
 public:
@@ -21,16 +23,20 @@ public:
 	glm::vec2 GetDropPos() const;
 	void SetDropTest(const bool& q);
 	bool GetDropTest() const;
+	void SetAbort(const bool& q);
+	bool GetAbort() const;
 	bool GetNormalDisplay() const;
 	void ToggleNormalDisplay();
 	float GetDeltaTime() const;
 	void Update();
+	bool m_KeyMap[KEY_COUNT] = { false };
 private:
 	float m_DeltaTime;
 	float m_NowTime;
 	float m_LastTime;
 	glm::vec2 m_DropPos;
 	bool m_DropTest;
+	bool m_Abort;
 	Window m_Window;
 	Camera m_Camera;
 	float m_FOV;
@@ -41,6 +47,8 @@ private:
 	friend void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 	friend void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 	friend void processInput();
+
+	
 };
 
 extern State state;

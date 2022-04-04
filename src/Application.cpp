@@ -34,18 +34,19 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    int width = state.GetWindow().GetWidth();
-    int height = state.GetWindow().GetHeight();
-    glm::vec2 q;
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    
+    
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
     {
-        if (Application::RayCast((double)width / 2.0, (double)height / 2.0, q))
-        {
-            glm::vec2 uvDropPos = 0.5f * q + glm::vec2(0.5f);
-            state.SetDropTest(true);
-            state.SetDropPos(uvDropPos);
+        if (action == GLFW_PRESS) {
+            state.m_KeyMap[M1] = true;
+            std::cout << "press\n";
         }
+        if (action == GLFW_RELEASE)
+            state.m_KeyMap[M1] = false;
     }
+
+
 }
  
 void processInput()
@@ -63,6 +64,8 @@ void processInput()
         camera.Slide(speed, DirectionEnum::RIGHT);
     if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
         state.ToggleNormalDisplay();
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        state.SetAbort(true);
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -70,6 +73,21 @@ void processInput()
     if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+
+    if (state.m_KeyMap[M1]) {
+        int width = state.GetWindow().GetWidth();
+        int height = state.GetWindow().GetHeight();
+        glm::vec2 q;
+        if (Application::RayCast((double)width / 2.0, (double)height / 2.0, q))
+        {
+            glm::vec2 uvDropPos = 0.5f * q + glm::vec2(0.5f);
+
+            if (glm::distance(uvDropPos, state.GetDropPos()) > 0.0) {
+                state.SetDropTest(true);
+                state.SetDropPos(uvDropPos);
+            }
+        }
     }
 }
 
@@ -305,10 +323,12 @@ int Application::Run()
             waveProcess.SetFloat("texelSize", 1.0f / (float)res);
             //waveProcess.SetVec2("dropPos", state.GetDropPos());
             //waveProcess.SetBool("drop", state.GetDropTest());
+            waveProcess.SetBool("abort", state.GetAbort());
             waveProcess.SetFloat("deltaTime", deltaTime);
             glBindTexture(GL_TEXTURE_2D, dropped.GetColor());
             quad.Draw();
             state.SetDropTest(false);
+            state.SetAbort(false);
         heightField[i].Unbind();
 
         lowPass.Bind();
