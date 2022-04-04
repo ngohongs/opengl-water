@@ -11,6 +11,9 @@ uniform mat4 lightView;
 
 out vec2 texCoord;
 
+out vec3 fPosition;
+out vec3 fNormal;
+
 vec2 calculateTexCoord() {
     vec4 lightClip = orthogonal * lightView * model * vec4(aPos, 1.0);
     vec2 texC = 0.5 * (lightClip.xy/lightClip.w) + 0.5;
@@ -20,5 +23,13 @@ vec2 calculateTexCoord() {
 void main()
 {
     texCoord = calculateTexCoord();
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+
+    vec4 worldCoord = model * vec4(aPos, 1.0);
+    vec4 viewCoord = view * worldCoord;
+    vec4 projCoord = projection * viewCoord;
+
+    fPosition = vec3(worldCoord);
+    fNormal = mat3(transpose(inverse(model)))  * aNormal;
+
+    gl_Position = projCoord;
 }   

@@ -177,6 +177,11 @@ int Application::Run()
     std::cout << depth.AttachShader(FRAGMENT, "shaders/depth.frag") << std::endl;
     std::cout << "depth " << depth.LinkProgram() << std::endl;
 
+    Shader blur;
+    std::cout << blur.AttachShader(VERTEX, "shaders/lowpass.vert") << std::endl;
+    std::cout << blur.AttachShader(FRAGMENT, "shaders/lowpass.frag") << std::endl;
+    std::cout << "blur " << blur.LinkProgram() << std::endl;
+
     std::cout << "----" << std::endl;
         
     int res = 64;
@@ -224,8 +229,7 @@ int Application::Run()
     Skybox skybox(faces);
 
     Light light(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
-        glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f));
-
+        { 0.1f, 0.1f, 0.1f }, { 0.8f, 0.8f, 0.8f }, { 1.0f, 1.0f, 1.0f });
 
    
 
@@ -245,6 +249,9 @@ int Application::Run()
     RenderTarget reflPos = { width, height, COLOR_RENDERBUFFER, LINEAR };
 
 
+    RenderTarget lowPass = { width, height, COLOR_RENDERBUFFER, LINEAR };
+
+
 
     Camera& camera = state.GetCamera();
 
@@ -262,9 +269,13 @@ int Application::Run()
     glEnable(GL_BLEND);
     glEnable(GL_CLIP_DISTANCE0);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glm::vec3 sandColor({ .76f, .69f, .5f });
+    glm::vec3 pinkColor({ 1.0f, 0.0f, 1.0f });
     
     while (!glfwWindowShouldClose(window))
     {
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         state.Update();
         float deltaTime = state.GetDeltaTime();
         processInput();
@@ -300,7 +311,16 @@ int Application::Run()
             state.SetDropTest(false);
         heightField[i].Unbind();
 
-    
+        lowPass.Bind();
+            glEnable(GL_DEPTH_TEST);
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            blur.Use();
+            blur.SetVec2("texelSize", glm::vec2(1.0f/ width, 1.0f / height));
+            blur.Use();
+            glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
+            quad.Draw();
+        lowPass.Unbind();
 
          
 
@@ -310,14 +330,31 @@ int Application::Run()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         
         reciever.Use();
+        reciever.SetVec3("cameraPosition", camera.GetEye());
+
+        //reciever.SetVec3("light.pos", light.GetPosition());
+        reciever.SetVec3("light.dir", light.GetDirection());
+        reciever.SetVec3("light.amb", light.GetAmbient());
+        reciever.SetVec3("light.dif", light.GetDiffuse());
+        reciever.SetVec3("light.spe", light.GetSpecular());
+
         reciever.SetMat4("projection", proj);
         reciever.SetMat4("view", view);
-        reciever.SetMat4("model", plane2.GetModelMatrix());
         reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
         reciever.SetMat4("lightView", light.GetViewMatrix());
         glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
+
+        reciever.SetVec3("material.amb", .7f * sandColor);
+        reciever.SetVec3("material.dif", 1.0f * sandColor);
+        reciever.SetVec3("material.spe", .31f * sandColor);
+        reciever.SetFloat("material.shi", 10.0f);
+        reciever.SetMat4("model", plane2.GetModelMatrix());
         plane2.Draw();
-        
+
+        reciever.SetVec3("material.amb", .7f * pinkColor);
+        reciever.SetVec3("material.dif", 1.0f * pinkColor);
+        reciever.SetVec3("material.spe", .31f * pinkColor);
+        reciever.SetFloat("material.shi", 10.0f);
         reciever.SetMat4("model", cube.GetModelMatrix());
         cube.Draw();
 
@@ -348,20 +385,6 @@ int Application::Run()
         plane.Draw();
         
 
-        depthTex.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            depth.Use();
-            depth.SetMat4("projection", proj);
-            depth.SetMat4("view", view);
-            depth.SetMat4("model", plane2.GetModelMatrix());
-            plane2.Draw();
-
-            depth.SetMat4("model", cube.GetModelMatrix());
-            cube.Draw();
-        depthTex.Unbind();
-
         refrPos.Bind();
             glEnable(GL_DEPTH_TEST);
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -384,15 +407,33 @@ int Application::Run()
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
             reciever.Use();
+            reciever.SetVec3("cameraPosition", camera.GetEye());
+
+            //reciever.SetVec3("light.pos", light.GetPosition());
+            reciever.SetVec3("light.dir", light.GetDirection());
+            reciever.SetVec3("light.amb", light.GetAmbient());
+            reciever.SetVec3("light.dif", light.GetDiffuse());
+            reciever.SetVec3("light.spe", light.GetSpecular());
+
             reciever.SetMat4("projection", proj);
             reciever.SetMat4("view", view);
             reciever.SetMat4("model", plane2.GetModelMatrix());
             reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
             reciever.SetMat4("lightView", light.GetViewMatrix());
             glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
+
+            reciever.SetVec3("material.amb", .7f * sandColor);
+            reciever.SetVec3("material.dif", 1.0f * sandColor);
+            reciever.SetVec3("material.spe", .31f * sandColor);
+            reciever.SetFloat("material.shi", 10.0f);
             plane2.Draw();
 
+
             reciever.SetMat4("model", cube.GetModelMatrix());
+            reciever.SetVec3("material.amb", .7f * pinkColor);
+            reciever.SetVec3("material.dif", 1.0f * pinkColor);
+            reciever.SetVec3("material.spe", .31f * pinkColor);
+            reciever.SetFloat("material.shi", 10.0f);
             cube.Draw();
 
             skybox.Draw(proj, view);
@@ -418,12 +459,25 @@ int Application::Run()
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
             reciever.Use();
+            reciever.SetVec3("cameraPosition", camera.GetEye());
+
+            //reciever.SetVec3("light.pos", light.GetPosition());
+            reciever.SetVec3("light.dir", light.GetDirection());
+            reciever.SetVec3("light.amb", light.GetAmbient());
+            reciever.SetVec3("light.dif", light.GetDiffuse());
+            reciever.SetVec3("light.spe", light.GetSpecular());
+
             reciever.SetMat4("projection", proj);
             reciever.SetMat4("view", view);
             reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
             reciever.SetMat4("lightView", light.GetViewMatrix());
             glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
             reciever.SetMat4("model", cube.GetModelMatrix());
+
+            reciever.SetVec3("material.amb", .7f * pinkColor);
+            reciever.SetVec3("material.dif", 1.0f * pinkColor);
+            reciever.SetVec3("material.spe", .31f * pinkColor);
+            reciever.SetFloat("material.shi", 10.0f);
             cube.Draw();
 
             skybox.Draw(proj, view);
@@ -453,13 +507,13 @@ int Application::Run()
         glBindTexture(GL_TEXTURE_2D, refrPos.GetColor());
         debugdlQuad.Draw();
         //BR
-        glBindTexture(GL_TEXTURE_2D, refractionColor.GetColor());
+        glBindTexture(GL_TEXTURE_2D, lowPass.GetColor());
         debugddQuad.Draw();
         //TR
         glBindTexture(GL_TEXTURE_2D, reflPos.GetColor());
         debugQuad.Draw();
         //TL
-        glBindTexture(GL_TEXTURE_2D, reflectionColor.GetColor());
+        glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
         debuglQuad.Draw();
 
         crosshair.Draw();
@@ -527,6 +581,7 @@ int Application::Run()
 
         //caustics
         //glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
         causticMap.Bind();
             glEnable(GL_DEPTH_TEST);
             glClearColor(0.0f, 0.0f, 0.0f, 1);
