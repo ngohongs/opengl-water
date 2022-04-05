@@ -22,13 +22,20 @@ layout(binding=4) uniform sampler2D positionsReflected;
 layout(binding=3) uniform sampler2D colorRefracted;
 layout(binding=5) uniform sampler2D colorReflected;
 
-
+layout(binding=6) uniform sampler2D screenDepth;
 
 
 uniform vec3 cameraPosition;
 
 const float eta = 1.00 / 1.52;
 
+float LinearizeDepth(float depth) 
+{
+    float far = 100.0f;
+    float near = 0.1f;
+    float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
 
 vec2 calculateRefractUV(vec3 normal) {
     vec3 viewDir = normalize(fPosition - cameraPosition);
@@ -39,14 +46,14 @@ vec2 calculateRefractUV(vec3 normal) {
     return texC;
 }
 
-vec2 EstimateIntersection(vec3 v, vec3 r, sampler2D positions) {
-	vec3 p1 = v + 0.3 * r;
+vec2 EstimateIntersection(vec3 v, vec3 r, vec3 normal, sampler2D positions) {
+	vec3 p1 = v + 0.1 * (1 - dot(normal, normalize(toCameraDir))) * r;
 	vec4 texPt = projection * view * vec4(p1, 1.0);
 	vec2 texC = 0.5 * (texPt.xy/texPt.w) + 0.5;
 	vec4 recPos = texture(positions, texC);
     if (recPos.a <= 0.0f)
         return vec2(-1.0f);
-	float d = distance(v, recPos.xyz);
+	float d = distance(v, recPos.xyz) * (1 - dot(normal, normalize(toCameraDir)));
 	vec3 p2 = v + d * r;
 	texPt = projection * view * vec4(p2, 1.0);
 	texC = 0.5 * (texPt.xy/texPt.w) + 0.5;
@@ -56,6 +63,66 @@ vec2 EstimateIntersection(vec3 v, vec3 r, sampler2D positions) {
 	return texC;
 }
 
+
+vec3 getScreenPos (vec3 worldPos) {
+	vec4 screenPos 	= projection * view * vec4(worldPos, 1.0);
+	vec3 screenPos3	= screenPos.xyz / screenPos.w;
+	return (screenPos3 + vec3(1.0)) / 2.0;
+}
+
+vec3 raytrace(in vec3 reflectionWorld, in int maxCount, in float stepSize) {
+	vec3 color = vec3(1.0); 	
+	vec3 testVec = fWorldCoord.xyz;
+	
+	vec3 reflectionVector = reflectionWorld * stepSize;
+	
+	vec3 screenPos		= getScreenPos(testVec);
+	vec2 screenTexPos 	= screenPos.xy;
+	
+	
+	float texDepth = LinearizeDepth(texture(screenDepth, screenTexPos).x);
+	float worldDepth = LinearizeDepth(screenPos.z);
+	
+	bool run = true;
+	int count = 0;
+
+	while (run) {
+		texDepth = texture(screenDepth, screenTexPos).x;
+		float mask = texture(colorRefracted, screenTexPos).a;
+		worldDepth = screenPos.z;
+		
+		
+		if (texDepth <= worldDepth) {
+			color = texture(colorRefracted, screenTexPos).rgb;
+			break;
+		}
+
+		
+		testVec 		= testVec + reflectionVector;
+		screenPos		= getScreenPos(testVec);
+		screenTexPos 	= screenPos.xy;
+		
+		count = count+1;
+		run = 	screenTexPos.x < 1.0 && screenTexPos.x >= 0.0 &&
+				screenTexPos.y < 1.0 && screenTexPos.y >= 0.0 && count < maxCount;
+	}
+	
+	if (!run) {
+		color = texture(environment, reflectionWorld).rgb;
+
+	}
+	
+	return color;
+} 
+
+float calcStepSize(float stepSize, float max, vec3 n, vec3 cam) {
+	float scalarProduct = dot(-n, cam);
+	float res = 0.0;
+	
+	res = (1.0 - scalarProduct) * (max-stepSize);
+	
+	return res + stepSize;
+}
 
 void main()
 {    
@@ -92,16 +159,23 @@ void main()
 	//vec4 refractColor = texture(belowSurface, calculateRefractUV(normal));
     
 	//GOOD ------------------
-	vec2 refractedUV = EstimateIntersection(fWorldCoord.xyz, refractDir, positionsRefracted);
+	vec2 refractedUV = EstimateIntersection(fWorldCoord.xyz, refractDir, normal, positionsRefracted);
     vec4 refractedColor = texture(colorRefracted, refractedUV);
     if (refractedUV.x < 0.0f)
         refractedColor = mix(texture(environment, refractDir), texture(environment, viewDir), 0.3);
 	//-----------------------
 
-	vec2 reflectedUV = EstimateIntersection(fWorldCoord.xyz, reflectDir, positionsReflected);
+	vec2 reflectedUV = EstimateIntersection(fWorldCoord.xyz, reflectDir, normal, positionsReflected);
     vec4 reflectedColor = texture(colorReflected, reflectedUV);
     if (reflectedUV.x < 0.0f)
         reflectedColor = texture(environment, reflectDir);
+
+	const int maxCount = 250;
+	float stepSize = 0.01;
+	float maxStepSize = 0.1;
+	//stepSize = calcStepSize(stepSize, maxStepSize , normal, viewDir);
+	vec3 testr = raytrace(refractDir, maxCount, stepSize);
+	vec3 testl = raytrace(reflectDir, maxCount, stepSize);
 
     float ci = dot(normal, viewDir);
     float ct = dot(normal, refractDir);
@@ -114,6 +188,8 @@ void main()
 
     float rc = 1 - (rs+rp) / 2;
     float fresnel = dot(normalize(toCameraDir), normal);
-    vec4 color = mix(reflectColor, vec4(120.0f/255.0f, 150.0f/255.0f, 233.0f/255.0f, .3f), rc);
-    FragColor = mix(reflectedColor, refractedColor, rc);
+    vec3 color = mix(reflectedColor, refractedColor, rc).rgb;
+	vec3 test = mix(testl, testr, rc);
+	vec3 waterColor = vec3(2.0f, 204.0f, 147.0f) / 255.0f;
+    FragColor = vec4(vec3(mix(color, waterColor, 0.025f)), 1.0f);
 }

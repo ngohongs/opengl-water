@@ -2,5 +2,5 @@
 
 int main()
 {
-	return Application(1280, 720).Run();
+	return Application(2560, 1440).Run();
 }

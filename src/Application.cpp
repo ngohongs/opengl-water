@@ -39,11 +39,13 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_LEFT)
     {
         if (action == GLFW_PRESS) {
+            state.m_M1Prev = state.m_KeyMap[M1];
             state.m_KeyMap[M1] = true;
-            std::cout << "press\n";
         }
-        if (action == GLFW_RELEASE)
+        if (action == GLFW_RELEASE) {
+            state.m_M1Prev = state.m_KeyMap[M1];
             state.m_KeyMap[M1] = false;
+        }
     }
 
 
@@ -74,7 +76,27 @@ void processInput()
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+    {
+        //imgui
+        glfwSetCursorPosCallback(window, ImGui_ImplGlfw_CursorPosCallback);
+        glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
+        state.m_FirstMouse = true;
+        
+    }
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    {
+        //my app
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(window, mouse_callback);
+        glfwSetMouseButtonCallback(window, mouse_button_callback);
+
+
+        
+    }
+        
     if (state.m_KeyMap[M1]) {
         int width = state.GetWindow().GetWidth();
         int height = state.GetWindow().GetHeight();
@@ -83,12 +105,14 @@ void processInput()
         {
             glm::vec2 uvDropPos = 0.5f * q + glm::vec2(0.5f);
 
-            if (glm::distance(uvDropPos, state.GetDropPos()) > 0.0) {
+            if (glm::distance(uvDropPos, state.GetDropPos()) > 0.0 || state.m_M1Prev == false) {
                 state.SetDropTest(true);
                 state.SetDropPos(uvDropPos);
             }
         }
     }
+
+    state.m_M1Prev = state.m_KeyMap[M1];
 }
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
@@ -118,12 +142,8 @@ int Application::Init()
     GLFWwindow* window = state.GetWindow().GetGLFWWindow();
 
     /* Make the window's context current */
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(window);   
 
-    glfwSetCursorPosCallback(window, cursor_position_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);    
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     GLint GlewInitResult = glewInit();
     if (GLEW_OK != GlewInitResult)
@@ -133,6 +153,21 @@ int Application::Init()
         return 0;
     }
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 130");
+
+    ImGui::GetIO().FontGlobalScale = 1.5;
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
     return 1;
 }
 
@@ -149,16 +184,10 @@ int Application::Run()
     std::cout << drop.AttachShader(FRAGMENT, "shaders/drop.frag") << std::endl;
     std::cout << "drop " << drop.LinkProgram() << std::endl;
 
-    Shader debug;
-    std::cout << debug.AttachShader(VERTEX, "shaders/debug.vert") << std::endl;
-    std::cout << debug.AttachShader(FRAGMENT, "shaders/debug.frag") << std::endl;
-    std::cout << "debug " << debug.LinkProgram() << std::endl;
-
     Shader displayTexture;
     std::cout << displayTexture.AttachShader(VERTEX, "shaders/displaytexture.vert") << std::endl;
     std::cout << displayTexture.AttachShader(FRAGMENT, "shaders/displaytexture.frag") << std::endl;
     std::cout << "displayTexture " << displayTexture.LinkProgram() << std::endl;
-
 
     Shader wave;
     std::cout << wave.AttachShader(VERTEX, "shaders/wave.vert") << std::endl;
@@ -190,11 +219,6 @@ int Application::Run()
     std::cout << reciever.AttachShader(FRAGMENT, "shaders/reciever.frag") << std::endl;
     std::cout << "reciever " << reciever.LinkProgram() << std::endl;
 
-    Shader depth;
-    std::cout << depth.AttachShader(VERTEX, "shaders/depth.vert") << std::endl;
-    std::cout << depth.AttachShader(FRAGMENT, "shaders/depth.frag") << std::endl;
-    std::cout << "depth " << depth.LinkProgram() << std::endl;
-
     Shader blur;
     std::cout << blur.AttachShader(VERTEX, "shaders/lowpass.vert") << std::endl;
     std::cout << blur.AttachShader(FRAGMENT, "shaders/lowpass.frag") << std::endl;
@@ -214,8 +238,10 @@ int Application::Run()
     planeInd.clear();
     PlaneGenerator().Generate(2, planeVert, planeInd);
     Geometry plane2(planeVert, planeInd);
-    plane2.SetPosition(glm::vec3(0.0f, -0.4f, 0.0f));
+    float plane2Height = -1.0f;
+    plane2.SetPosition(glm::vec3(0.0f, plane2Height, 0.0f));
     plane2.SetScale(glm::vec3(1.0f));
+    
 
     planeVert.clear();
     PlaneGenerator().GenerateGrid(width, height, planeVert);
@@ -223,8 +249,12 @@ int Application::Run()
     grid.LoadGrid(planeVert);
 
     Geometry cube(cubeVertices, cubeNVertices, cubeTriangles, cubeNTriangles);
-    cube.SetScale(glm::vec3(0.3f));
-    cube.SetPosition(glm::vec3(0.0f, 0.15f, 0.0f));
+    cube.SetScale(glm::vec3(0.30f));
+    float cubeHeight = -0.45f;
+    cube.SetPosition(glm::vec3(0.0f, cubeHeight, 0.0f));
+    
+
+
     Geometry quad(quadVertices, quadNVertices, quadTriangles, quadNTriangles);
     Geometry debugQuad(dquadVertices, dquadNVertices, dquadTriangles, dquadNTriangles);
     Geometry debuglQuad(dlquadVertices, dlquadNVertices, dlquadTriangles, dlquadNTriangles);
@@ -249,23 +279,22 @@ int Application::Run()
     Light light(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
         { 0.1f, 0.1f, 0.1f }, { 0.8f, 0.8f, 0.8f }, { 1.0f, 1.0f, 1.0f });
 
-   
-
 
     RenderTarget heightField[2] = { {res, res, COLOR, LINEAR}, {res, res, COLOR, LINEAR} };
     RenderTarget dropped = {res, res, COLOR, LINEAR};
+
     RenderTarget receiverPositions = {width, height, COLOR_RENDERBUFFER, NEAREST};
     RenderTarget refractiveNormals = {width, height, COLOR, NEAREST};
     RenderTarget wavePositions = {width, height, COLOR, NEAREST};
     RenderTarget causticMap = {width, height, COLOR, LINEAR};
     
-    RenderTarget depthTex = { width, height, COLOR_RENDERBUFFER, LINEAR };
-    RenderTarget refractionColor = { width, height, COLOR_RENDERBUFFER, LINEAR };
-    RenderTarget reflectionColor = { width, height, COLOR_RENDERBUFFER, LINEAR };
+
+    RenderTarget refractionColor = { width, height, COLOR_DEPTH, LINEAR };
+    RenderTarget reflectionColor = { width, height, COLOR_DEPTH, LINEAR };
+
 
     RenderTarget refrPos = { width, height, COLOR_RENDERBUFFER, LINEAR };
     RenderTarget reflPos = { width, height, COLOR_RENDERBUFFER, LINEAR };
-
 
     RenderTarget lowPass = { width, height, COLOR_RENDERBUFFER, LINEAR };
 
@@ -285,14 +314,33 @@ int Application::Run()
     GLenum err;
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    glEnable(GL_CLIP_DISTANCE0);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glm::vec3 sandColor({ .76f, .69f, .5f });
     glm::vec3 pinkColor({ 1.0f, 0.0f, 1.0f });
     
+
+
+
+    bool show_demo_window = true;
+    bool show_another_window = false;
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+
+
+    int size = res;
     while (!glfwWindowShouldClose(window))
     {
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        cube.SetPosition(glm::vec3(0.0f, cubeHeight, 0.0f));
+        plane2.SetPosition(glm::vec3(0.0f, plane2Height, 0.0f));
+
+
+
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         state.Update();
         float deltaTime = state.GetDeltaTime();
@@ -309,6 +357,7 @@ int Application::Run()
             drop.SetFloat("texelSize", 1.0f / (float)res);
             drop.SetVec2("dropPos", state.GetDropPos());
             drop.SetBool("drop", state.GetDropTest());
+
             glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
             quad.Draw();
             state.SetDropTest(false);
@@ -324,6 +373,7 @@ int Application::Run()
             //waveProcess.SetVec2("dropPos", state.GetDropPos());
             //waveProcess.SetBool("drop", state.GetDropTest());
             waveProcess.SetBool("abort", state.GetAbort());
+            waveProcess.SetInt("size", size);
             waveProcess.SetFloat("deltaTime", deltaTime);
             glBindTexture(GL_TEXTURE_2D, dropped.GetColor());
             quad.Draw();
@@ -350,6 +400,7 @@ int Application::Run()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         
         reciever.Use();
+        reciever.SetFloat("waterHeight", 0.0f);
         reciever.SetVec3("cameraPosition", camera.GetEye());
 
         //reciever.SetVec3("light.pos", light.GetPosition());
@@ -363,16 +414,19 @@ int Application::Run()
         reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
         reciever.SetMat4("lightView", light.GetViewMatrix());
         glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, receiverPositions.GetColor());
+        glActiveTexture(GL_TEXTURE0);
 
-        reciever.SetVec3("material.amb", .7f * sandColor);
-        reciever.SetVec3("material.dif", 1.0f * sandColor);
+        reciever.SetVec3("material.amb", 0.4f * sandColor);
+        reciever.SetVec3("material.dif", 0.7f * sandColor);
         reciever.SetVec3("material.spe", .31f * sandColor);
         reciever.SetFloat("material.shi", 10.0f);
         reciever.SetMat4("model", plane2.GetModelMatrix());
         plane2.Draw();
 
-        reciever.SetVec3("material.amb", .7f * pinkColor);
-        reciever.SetVec3("material.dif", 1.0f * pinkColor);
+        reciever.SetVec3("material.amb", 0.4f * pinkColor);
+        reciever.SetVec3("material.dif", 0.7f * pinkColor);
         reciever.SetVec3("material.spe", .31f * pinkColor);
         reciever.SetFloat("material.shi", 10.0f);
         reciever.SetMat4("model", cube.GetModelMatrix());
@@ -400,6 +454,8 @@ int Application::Run()
         glBindTexture(GL_TEXTURE_2D, reflPos.GetColor());
         glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_2D, reflectionColor.GetColor());
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, refractionColor.GetDepth());
         glActiveTexture(GL_TEXTURE0);
 
         plane.Draw();
@@ -422,13 +478,16 @@ int Application::Run()
         refrPos.Unbind();
 
         refractionColor.Bind();
+            glEnable(GL_CLIP_DISTANCE0);
             glEnable(GL_DEPTH_TEST);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
             reciever.Use();
+            reciever.SetBool("under", true);
+            reciever.SetFloat("waterHeight", 0.0f);
             reciever.SetVec3("cameraPosition", camera.GetEye());
-
+            
             //reciever.SetVec3("light.pos", light.GetPosition());
             reciever.SetVec3("light.dir", light.GetDirection());
             reciever.SetVec3("light.amb", light.GetAmbient());
@@ -441,23 +500,26 @@ int Application::Run()
             reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
             reciever.SetMat4("lightView", light.GetViewMatrix());
             glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, receiverPositions.GetColor());
+            glActiveTexture(GL_TEXTURE0);
 
-            reciever.SetVec3("material.amb", .7f * sandColor);
-            reciever.SetVec3("material.dif", 1.0f * sandColor);
+            reciever.SetVec3("material.amb", 0.4f * sandColor);
+            reciever.SetVec3("material.dif", 0.7f * sandColor);
             reciever.SetVec3("material.spe", .31f * sandColor);
             reciever.SetFloat("material.shi", 10.0f);
             plane2.Draw();
 
 
             reciever.SetMat4("model", cube.GetModelMatrix());
-            reciever.SetVec3("material.amb", .7f * pinkColor);
-            reciever.SetVec3("material.dif", 1.0f * pinkColor);
+            reciever.SetVec3("material.amb", 0.4f * pinkColor);
+            reciever.SetVec3("material.dif", 0.7f * pinkColor);
             reciever.SetVec3("material.spe", .31f * pinkColor);
             reciever.SetFloat("material.shi", 10.0f);
             cube.Draw();
 
             skybox.Draw(proj, view);
-
+            glDisable(GL_CLIP_DISTANCE0);
         refractionColor.Unbind();
 
         reflPos.Bind();
@@ -474,11 +536,14 @@ int Application::Run()
         reflPos.Unbind();
 
         reflectionColor.Bind();
+            glEnable(GL_CLIP_DISTANCE0);
             glEnable(GL_DEPTH_TEST);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
             reciever.Use();
+            reciever.SetBool("under", false);
+            reciever.SetFloat("waterHeight", 0.0f);
             reciever.SetVec3("cameraPosition", camera.GetEye());
 
             //reciever.SetVec3("light.pos", light.GetPosition());
@@ -492,16 +557,18 @@ int Application::Run()
             reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
             reciever.SetMat4("lightView", light.GetViewMatrix());
             glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, receiverPositions.GetColor());
+            glActiveTexture(GL_TEXTURE0);
             reciever.SetMat4("model", cube.GetModelMatrix());
 
-            reciever.SetVec3("material.amb", .7f * pinkColor);
-            reciever.SetVec3("material.dif", 1.0f * pinkColor);
+            reciever.SetVec3("material.amb", 0.4f * pinkColor);
+            reciever.SetVec3("material.dif", 0.7f * pinkColor);
             reciever.SetVec3("material.spe", .31f * pinkColor);
             reciever.SetFloat("material.shi", 10.0f);
             cube.Draw();
 
-            skybox.Draw(proj, view);
-
+            glDisable(GL_CLIP_DISTANCE0);
         reflectionColor.Unbind();
 
 
@@ -519,21 +586,19 @@ int Application::Run()
 
         // Debug UI ----------------------------------------------------------------------
         glDisable(GL_DEPTH_TEST);
-        
-        /*glBindTexture(GL_TEXTURE_2D, gaussianTexture[1 - i]);
-        quad.Draw();*/
+
         displayTexture.Use();
         //BL
-        glBindTexture(GL_TEXTURE_2D, refrPos.GetColor());
+        glBindTexture(GL_TEXTURE_2D, reflectionColor.GetColor());
         debugdlQuad.Draw();
         //BR
         glBindTexture(GL_TEXTURE_2D, lowPass.GetColor());
         debugddQuad.Draw();
         //TR
-        glBindTexture(GL_TEXTURE_2D, reflPos.GetColor());
+        glBindTexture(GL_TEXTURE_2D, refractionColor.GetColor());
         debugQuad.Draw();
         //TL
-        glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
+        glBindTexture(GL_TEXTURE_2D, receiverPositions.GetColor());
         debuglQuad.Draw();
 
         crosshair.Draw();
@@ -600,7 +665,6 @@ int Application::Run()
         wavePositions.Unbind();
 
         //caustics
-        //glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
         causticMap.Bind();
             glEnable(GL_DEPTH_TEST);
@@ -628,6 +692,36 @@ int Application::Run()
         i = 1 - i;
 
 
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+
+            ImGui::Begin("Settings");                          // Create a window called "Hello, world!" and append into it.
+
+            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+            ImGui::Checkbox("Another Window", &show_another_window);
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+                counter++;
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::SliderFloat("Cube height", &cubeHeight, -3.0f, 3.0f);
+            ImGui::SliderFloat("Bed height", &plane2Height, -3.0f, 3.0f);
+            //ImGui::SliderInt("Size water", &size, 32, 128);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+
         glfwSwapBuffers(window);
         glfwPollEvents();
 
@@ -636,7 +730,15 @@ int Application::Run()
             std::cout << GetGLErrorStr(err) << std::endl;
             break;
         }
+
+
+
+        
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     glfwTerminate();
     return 0;
@@ -653,6 +755,8 @@ bool Application::RayCast(double mouseX, double mouseY, glm::vec2& q)
     glReadPixels((GLint)mouseX, (GLint)(height - 1 - mouseY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
 
     glm::vec3 winCoords = glm::vec3(mouseX, height - 1 - mouseY, 1);
+
+
 
     glm::mat4 projection = state.GetProjectionMatrix();
     glm::mat4 view = state.GetCamera().GetViewMatrix();
@@ -674,7 +778,7 @@ bool Application::RayCast(double mouseX, double mouseY, glm::vec2& q)
         if (-1.0f <= p.x && p.x <= 1.0f &&
             -1.0f <= p.z && p.z <= 1.0f)
         {
-            std::cout << "intersect: " << "(" << p.x << ", " << p.y << ", " << p.z << ")\n";
+            //std::cout << "intersect: " << "(" << p.x << ", " << p.y << ", " << p.z << ")\n";
             q = glm::vec2(p.x, p.z);
             return true;
         }

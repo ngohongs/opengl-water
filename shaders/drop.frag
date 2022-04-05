@@ -14,10 +14,10 @@ float height(vec2 pos)
 {
     if (!drop)
         return 0.0;
-    float radius = 3 * texelSize;
+    float radius = 1.5 * texelSize;
 	float val = max(0.0, 1.0 - length(dropPos - pos) / radius);
     val = 0.5 - cos(val * PI) * 0.5;
-    return 0.2 * val;
+    return  val;
 }
 
 

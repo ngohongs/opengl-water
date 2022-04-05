@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep\stb\;$(SolutionDir)shaders\;$(SolutionDir)dep\glew-2.1.0\include;$(SolutionDir)dep\glfw-3.3.6\include;$(SolutionDir)inc\;$(SolutionDir)dep\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\stb\;$(SolutionDir)shaders\;$(SolutionDir)dep\glew-2.1.0\include;$(SolutionDir)dep\glfw-3.3.6\include;$(SolutionDir)inc\;$(SolutionDir)dep\imgui-1.87;$(SolutionDir)dep\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep\stb\;$(SolutionDir)shaders\;$(SolutionDir)dep\glew-2.1.0\include;$(SolutionDir)dep\glfw-3.3.6\include;$(SolutionDir)inc\;$(SolutionDir)dep\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\stb\;$(SolutionDir)shaders\;$(SolutionDir)dep\glew-2.1.0\include;$(SolutionDir)dep\glfw-3.3.6\include;$(SolutionDir)inc\;$(SolutionDir)dep\imgui-1.87;$(SolutionDir)dep\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,6 +145,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dep\imgui-1.87\imgui.cpp" />
+    <ClCompile Include="dep\imgui-1.87\imgui_demo.cpp" />
+    <ClCompile Include="dep\imgui-1.87\imgui_draw.cpp" />
+    <ClCompile Include="dep\imgui-1.87\imgui_impl_glfw.cpp" />
+    <ClCompile Include="dep\imgui-1.87\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="dep\imgui-1.87\imgui_impl_win32.cpp" />
+    <ClCompile Include="dep\imgui-1.87\imgui_tables.cpp" />
+    <ClCompile Include="dep\imgui-1.87\imgui_widgets.cpp" />
     <ClCompile Include="src\Cubemap.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\Light.cpp" />
@@ -161,6 +169,16 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dep\imgui-1.87\imconfig.h" />
+    <ClInclude Include="dep\imgui-1.87\imgui.h" />
+    <ClInclude Include="dep\imgui-1.87\imgui_impl_glfw.h" />
+    <ClInclude Include="dep\imgui-1.87\imgui_impl_opengl3.h" />
+    <ClInclude Include="dep\imgui-1.87\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="dep\imgui-1.87\imgui_impl_win32.h" />
+    <ClInclude Include="dep\imgui-1.87\imgui_internal.h" />
+    <ClInclude Include="dep\imgui-1.87\imstb_rectpack.h" />
+    <ClInclude Include="dep\imgui-1.87\imstb_textedit.h" />
+    <ClInclude Include="dep\imgui-1.87\imstb_truetype.h" />
     <ClInclude Include="inc\Cubemap.h" />
     <ClInclude Include="inc\Crosshair.h" />
     <ClInclude Include="inc\Application.h" />
@@ -181,39 +199,22 @@
     <None Include="shaders\caustics.frag" />
     <None Include="shaders\crosshair.frag" />
     <None Include="shaders\crosshair.vert" />
-    <None Include="shaders\debug.frag" />
-    <None Include="shaders\debug.vert" />
     <None Include="shaders\displaytexture.frag" />
     <None Include="shaders\displaytexture.vert" />
     <None Include="shaders\drop.frag" />
     <None Include="shaders\drop.vert" />
-    <None Include="shaders\uv.frag" />
-    <None Include="shaders\uv.vert" />
     <None Include="shaders\gen.frag" />
     <None Include="shaders\gen.vert" />
-    <None Include="shaders\height.frag" />
-    <None Include="shaders\height.vert" />
-    <None Include="shaders\reflectioncolored.frag" />
-    <None Include="shaders\reflectioncolored.vert" />
     <None Include="shaders\lowpass.frag" />
     <None Include="shaders\lowpass.vert" />
-    <None Include="shaders\normaldisplay.frag" />
-    <None Include="shaders\normaldisplay.geom" />
-    <None Include="shaders\normaldisplay.vert" />
-    <None Include="shaders\depth.frag" />
-    <None Include="shaders\depth.vert" />
     <None Include="shaders\normals.frag" />
     <None Include="shaders\normals.vert" />
-    <None Include="shaders\pass.frag" />
-    <None Include="shaders\pass.vert" />
     <None Include="shaders\positions.frag" />
     <None Include="shaders\positions.vert" />
     <None Include="shaders\reciever.frag" />
     <None Include="shaders\reciever.vert" />
     <None Include="shaders\skybox.frag" />
     <None Include="shaders\skybox.vert" />
-    <None Include="shaders\test.frag" />
-    <None Include="shaders\test.vert" />
     <None Include="shaders\watermask.frag" />
     <None Include="shaders\watermask.vert" />
     <None Include="shaders\wave.frag" />

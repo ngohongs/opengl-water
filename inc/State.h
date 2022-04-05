@@ -30,6 +30,7 @@ public:
 	float GetDeltaTime() const;
 	void Update();
 	bool m_KeyMap[KEY_COUNT] = { false };
+	bool m_M1Prev = false;
 private:
 	float m_DeltaTime;
 	float m_NowTime;
