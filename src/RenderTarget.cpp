@@ -1,21 +1,6 @@
 #include "RenderTarget.h"
 #include <iostream>
 
-const char* GetGLErrorStr1(GLenum err)
-{
-    switch (err)
-    {
-    case GL_NO_ERROR:          return "No error";
-    case GL_INVALID_ENUM:      return "Invalid enum";
-    case GL_INVALID_VALUE:     return "Invalid value";
-    case GL_INVALID_OPERATION: return "Invalid operation";
-    case GL_STACK_OVERFLOW:    return "Stack overflow";
-    case GL_STACK_UNDERFLOW:   return "Stack underflow";
-    case GL_OUT_OF_MEMORY:     return "Out of memory";
-    default:                   return "Unknown error";
-    }
-}
-
 RenderTarget::RenderTarget(const int& width, const int& height)
 {
 	glGenFramebuffers(1, &m_FBO);
@@ -26,9 +11,7 @@ RenderTarget::RenderTarget(const int& width, const int& height)
     m_RBO = 0;
 }
 
-
-
-RenderTarget::RenderTarget(const int& width, const int& height, const RTType& type, const RTTextureFilter& filter)
+RenderTarget::RenderTarget(const int& width, const int& height, const RTType& type, const TextureFilter& filter)
 {
     //glGenFramebuffers(1, &m_FBO);
     m_Width = width;
@@ -49,31 +32,19 @@ RenderTarget::RenderTarget(const int& width, const int& height, const RTType& ty
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 }
 
-void RenderTarget::AttachColor(RTTextureFilter filter)
+void RenderTarget::AttachColor(TextureFilter filter)
 {
     
     glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    glGenTextures(1, &m_ColorTexture);
-    glBindTexture(GL_TEXTURE_2D, m_ColorTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_Width, m_Height, 0, GL_RGB, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorTexture, 0);
+    m_Color = Texture(m_Width, m_Height, TextureType::RGB, filter);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Color.GetTexture(), 0);
 }
 
-void RenderTarget::AttachDepth(RTTextureFilter filter)
+void RenderTarget::AttachDepth(TextureFilter filter)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-    glGenTextures(1, &m_DepthTexture);
-    glBindTexture(GL_TEXTURE_2D, m_DepthTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthTexture, 0);
+    m_Depth = Texture(m_Width, m_Height, TextureType::DEPTH, filter);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_Depth.GetTexture(), 0);
 }
 
 void RenderTarget::AttachRenderBuffer()
@@ -88,12 +59,12 @@ void RenderTarget::AttachRenderBuffer()
 
 GLuint RenderTarget::GetColor() const
 {
-    return m_ColorTexture;
+    return m_Color.GetTexture();
 }
 
 GLuint RenderTarget::GetDepth() const
 {
-    return m_DepthTexture;
+    return m_Depth.GetTexture();
 }
 
 void RenderTarget::Bind()
@@ -111,4 +82,14 @@ void RenderTarget::Unbind()
 GLuint RenderTarget::GetFBO() const
 {
     return m_FBO;
+}
+
+const Texture& RenderTarget::GetColorTexture() const
+{
+    return m_Color;
+}
+
+const Texture& RenderTarget::GetDepthTexture() const
+{
+    return m_Depth;
 }

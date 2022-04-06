@@ -21,7 +21,7 @@
 #include "Skybox.h"
 #include "Light.h"
 #include "RenderTarget.h"
-
+#include "Model.h"
 class Application
 {
 public:

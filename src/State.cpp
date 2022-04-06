@@ -40,7 +40,7 @@ glm::mat4 State::GetProjectionMatrix() const
 {
 	float width = m_Window.GetWidth();
 	float height = m_Window.GetHeight();
-	return glm::perspective(glm::radians(m_FOV), (float) width / (float) height, 0.1f, 100.0f);
+	return glm::perspective(glm::radians(m_FOV), (float) width / (float) height, 0.1f, 1000.0f);
 }
 
 glm::mat4 State::GetOrthogonalMatrix() const

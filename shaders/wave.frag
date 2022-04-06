@@ -31,7 +31,7 @@ const float eta = 1.00 / 1.52;
 
 float LinearizeDepth(float depth) 
 {
-    float far = 100.0f;
+    float far = 1000.0f;
     float near = 0.1f;
     float z = depth * 2.0 - 1.0; // back to NDC 
     return (2.0 * near * far) / (far + near - z * (far - near));	
@@ -70,7 +70,7 @@ vec3 getScreenPos (vec3 worldPos) {
 	return (screenPos3 + vec3(1.0)) / 2.0;
 }
 
-vec3 raytrace(in vec3 reflectionWorld, in int maxCount, in float stepSize) {
+vec3 raytrace(in vec3 reflectionWorld, in int maxCount, in float stepSize, sampler2D tex) {
 	vec3 color = vec3(1.0); 	
 	vec3 testVec = fWorldCoord.xyz;
 	
@@ -88,12 +88,12 @@ vec3 raytrace(in vec3 reflectionWorld, in int maxCount, in float stepSize) {
 
 	while (run) {
 		texDepth = texture(screenDepth, screenTexPos).x;
-		float mask = texture(colorRefracted, screenTexPos).a;
-		worldDepth = screenPos.z;
+		float mask = texture(tex, screenTexPos).a;
+		worldDepth = LinearizeDepth(screenPos.z);
 		
 		
 		if (texDepth <= worldDepth) {
-			color = texture(colorRefracted, screenTexPos).rgb;
+			color = texture(tex, screenTexPos).rgb;
 			break;
 		}
 
@@ -174,8 +174,8 @@ void main()
 	float stepSize = 0.01;
 	float maxStepSize = 0.1;
 	//stepSize = calcStepSize(stepSize, maxStepSize , normal, viewDir);
-	vec3 testr = raytrace(refractDir, maxCount, stepSize);
-	vec3 testl = raytrace(reflectDir, maxCount, stepSize);
+	vec3 testr = raytrace(refractDir, maxCount, stepSize, colorRefracted);
+	vec3 testl = raytrace(reflectDir, maxCount, stepSize, colorReflected);
 
     float ci = dot(normal, viewDir);
     float ct = dot(normal, refractDir);

@@ -8,9 +8,9 @@ class Geometry
 {
 public:
 	Geometry();
-	Geometry(const std::vector<Vertex>& verts, const std::vector<unsigned int> ind);
+	Geometry(const std::vector<Vertex>& verts, const std::vector<unsigned int>& ind);
 	Geometry(const float* verts, const int& vertCnt, const unsigned int * tri, const int& triCnt);
-	void Load(const std::vector<Vertex>& verts, const std::vector<unsigned int> ind);
+	void Load(const std::vector<Vertex>& verts, const std::vector<unsigned int>& ind);
 	void Load(const float* verts, const int& vertCnt, const unsigned int * tri, const int& indCnt);
 	void LoadGrid(const std::vector<Vertex>& verts);
 	void Bind() const;

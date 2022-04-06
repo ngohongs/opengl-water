@@ -11,7 +11,7 @@ Geometry::Geometry()
 	m_Scale = glm::vec3(1.0f);
 }
 
-Geometry::Geometry(const std::vector<Vertex>& verts, const std::vector<unsigned int> ind)
+Geometry::Geometry(const std::vector<Vertex>& verts, const std::vector<unsigned int>& ind)
 {
 	glGenVertexArrays(1, &m_VAO);
 	Load(verts, ind);
@@ -23,7 +23,7 @@ Geometry::Geometry(const float* verts, const int& vertCnt, const unsigned int * 
 	Load(verts, vertCnt, tri, triCnt);
 }
 
-void Geometry::Load(const std::vector<Vertex>& verts, const std::vector<unsigned int> ind)
+void Geometry::Load(const std::vector<Vertex>& verts, const std::vector<unsigned int>& ind)
 {
 	glGenBuffers(1, &m_VBO);
 	glGenBuffers(1, &m_EBO);
