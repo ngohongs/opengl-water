@@ -41,8 +41,7 @@ void Skybox::Draw(const glm::mat4& proj, const glm::mat4& view)
     m_Shader.Use();
     m_Shader.SetMat4("projection", proj);
     m_Shader.SetMat4("view", glm::mat4(glm::mat3(view)));
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_Cubemap);
-    m_Cube.Bind();
+    Bind(GL_TEXTURE0);
     m_Cube.Draw();
     glDepthFunc(GL_LESS);
 }
@@ -50,4 +49,10 @@ void Skybox::Draw(const glm::mat4& proj, const glm::mat4& view)
 GLuint Skybox::GetTexture() const
 {
     return m_Cubemap;
+}
+
+void Skybox::Bind(const int& unit)
+{
+    glActiveTexture(unit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_Cubemap);
 }

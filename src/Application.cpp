@@ -243,10 +243,7 @@ int Application::Run()
     Geometry grid;
     grid.LoadGrid(planeVert);
 
-    Geometry cube(cubeVertices, cubeNVertices, cubeTriangles, cubeNTriangles);
-    cube.SetScale(glm::vec3(0.30f));
-    float cubeHeight = -0.45f;
-    cube.SetPosition(glm::vec3(0.0f, cubeHeight, 0.0f));
+    
     
 
 
@@ -312,7 +309,7 @@ int Application::Run()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glm::vec3 sandColor({ .76f, .69f, .5f });
-    glm::vec3 pinkColor({ 1.0f, 1.0f, 1.0f });
+    glm::vec3 pinkColor({ 1.0f, 0.0f, 1.0f });
     
 
 
@@ -333,6 +330,13 @@ int Application::Run()
     Model terrain("resources/terrain/terrain.obj");
     terrain.SetScale(glm::vec3(0.125f, 0.25f, 0.125f));
     float terrainHeight = 0.0f;
+
+
+    Geometry cubeGeometry(cubeVertices, cubeNVertices, cubeTriangles, cubeNTriangles);
+    Material pinkMaterial{ 0.4f * pinkColor, 0.7f * pinkColor, 0.31f * pinkColor, 10.0f };
+    Model cube(cubeGeometry, pinkMaterial);
+    cube.SetScale(glm::vec3(0.30f));
+    float cubeHeight = -0.45f;
 
 
     int size = res;
@@ -365,8 +369,7 @@ int Application::Run()
             drop.SetFloat("texelSize", 1.0f / (float)res);
             drop.SetVec2("dropPos", state.GetDropPos());
             drop.SetBool("drop", state.GetDropTest());
-
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
+            heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE0);
             quad.Draw();
             state.SetDropTest(false);
             dropped.Unbind();
@@ -381,350 +384,301 @@ int Application::Run()
             waveProcess.SetBool("abort", state.GetAbort());
             waveProcess.SetInt("size", size);
             waveProcess.SetFloat("deltaTime", deltaTime);
-            glBindTexture(GL_TEXTURE_2D, dropped.GetColor());
+            dropped.GetColorTexture().Bind(GL_TEXTURE0);
             quad.Draw();
             state.SetDropTest(false);
             state.SetAbort(false);
             heightField[i].Unbind();
         }
-        //lowpass
-        {
-            lowPass.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glClearColor(0, 0, 0, 1);
-
-            
-            blur.Use();
-            blur.SetVec2("texelSize", glm::vec2(1.0f / width, 1.0f / height));
-            blur.Use();
-            glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
-            quad.Draw();
-            lowPass.Unbind();
-        }
+        
          
-
-        // Display;
-        glEnable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        
-        reciever.Use();
-        reciever.SetBool("duck", false);
-        reciever.SetBool("diffuseUsed", false);
-        reciever.SetFloat("waterHeight", 0.0f);
-        reciever.SetVec3("cameraPosition", camera.GetEye());
-
-        light.Bind(reciever);
-
-        reciever.SetMat4("projection", proj);
-        reciever.SetMat4("view", view);
-        reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
-        reciever.SetMat4("lightView", light.GetViewMatrix());
-        causticMap.GetColorTexture().Bind(GL_TEXTURE0);
-        receiverPositions.GetColorTexture().Bind(GL_TEXTURE1);
-
-        reciever.SetVec3("material.amb", 0.4f * sandColor);
-        reciever.SetVec3("material.dif", 0.7f * sandColor);
-        reciever.SetVec3("material.spe", .31f * sandColor);
-        reciever.SetFloat("material.shi", 10.0f);
-        terrain.Draw(reciever);
-        
-        reciever.SetVec3("material.amb", 0.4f * pinkColor);
-        reciever.SetVec3("material.dif", 0.7f * pinkColor);
-        reciever.SetVec3("material.spe", .31f * pinkColor);
-        reciever.SetFloat("material.shi", 10.0f);
-        reciever.SetMat4("model", cube.GetModelMatrix());
-        cube.Draw();
-
-        reciever.SetBool("duck", true);
-        reciever.SetVec3("duckPosition", duck.GetPosition());
-        reciever.SetFloat("texelSize", 1.0f / res);
-        heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE2);
-        duck.Draw(reciever);
-        
-        skybox.Draw(proj, view);
-
-        wave.Use();
-        wave.SetMat4("projection", proj);
-        wave.SetMat4("view", view);
-        wave.SetMat4("model", plane.GetModelMatrix());
-        wave.SetVec3("cameraPosition", camera.GetEye());
-        wave.SetFloat("texelSize", 1.0f / res);
-        heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE0);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTexture());
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, refrPos.GetColor());
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, refractionColor.GetColor());
-        glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, reflPos.GetColor());
-        glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_2D, reflectionColor.GetColor());
-        glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_2D, refractionColor.GetDepth());
-        glActiveTexture(GL_TEXTURE0);
-        plane.Draw();
-        
-
-
-
+        //scene
         {
-            refrPos.Bind();
-
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            positions.Use();
-            positions.SetBool("duck", false);
-            positions.SetBool("under", true);
-            positions.SetMat4("projection", proj);
-            positions.SetMat4("view", view);
-            positions.SetBool("wave", false);
-            positions.SetBool("inView", false);
-
-            terrain.Draw(positions);
-
-            positions.SetMat4("model", cube.GetModelMatrix());
-            cube.Draw();
-
-            refrPos.Unbind();
-        }
-        {
-            refractionColor.Bind();
-
+            // Display;
             glEnable(GL_DEPTH_TEST);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
             reciever.Use();
             reciever.SetBool("duck", false);
-            reciever.SetBool("under", true);
+            reciever.SetBool("diffuseUsed", false);
             reciever.SetFloat("waterHeight", 0.0f);
             reciever.SetVec3("cameraPosition", camera.GetEye());
-
             light.Bind(reciever);
-
             reciever.SetMat4("projection", proj);
             reciever.SetMat4("view", view);
             reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
             reciever.SetMat4("lightView", light.GetViewMatrix());
-            glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, receiverPositions.GetColor());
-            glActiveTexture(GL_TEXTURE0);
-
-            terrain.Draw(reciever);
-
-            reciever.SetMat4("model", cube.GetModelMatrix());
-            reciever.SetVec3("material.amb", 0.4f * pinkColor);
-            reciever.SetVec3("material.dif", 0.7f * pinkColor);
-            reciever.SetVec3("material.spe", .31f * pinkColor);
-            reciever.SetFloat("material.shi", 10.0f);
-            cube.Draw();
-
-            skybox.Draw(proj, view);
-
-            refractionColor.Unbind();
-        }
-        {
-            reflPos.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            positions.Use();
-            positions.SetBool("duck", false);
-            positions.SetBool("under", false);
-            positions.SetMat4("projection", proj);
-            positions.SetMat4("view", view);
-            positions.SetBool("wave", false);
-            positions.SetBool("inView", false);
-
-            terrain.Draw(positions);
-
-            positions.SetMat4("model", cube.GetModelMatrix());
-            cube.Draw();
-
-            positions.SetBool("duck", true);
-            positions.SetVec3("duckPosition", duck.GetPosition());
-            positions.SetFloat("texelSize", 1.0f / res);
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
-            glActiveTexture(GL_TEXTURE0);
-            duck.Draw(positions);
-
-            reflPos.Unbind();
-        }
-        {
-            reflectionColor.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-            reciever.Use();
-            reciever.SetBool("duck", false);
-            reciever.SetBool("under", false);
-            reciever.SetBool("under", false);
-            reciever.SetFloat("waterHeight", 0.0f);
-            reciever.SetVec3("cameraPosition", camera.GetEye());
-
-            light.Bind(reciever);
-
-            reciever.SetMat4("projection", proj);
-            reciever.SetMat4("view", view);
-            reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
-            reciever.SetMat4("lightView", light.GetViewMatrix());
-            glBindTexture(GL_TEXTURE_2D, causticMap.GetColor());
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, receiverPositions.GetColor());
-            glActiveTexture(GL_TEXTURE0);
-
-            terrain.Draw(reciever);
-
-            reciever.SetVec3("material.amb", 0.4f * pinkColor);
-            reciever.SetVec3("material.dif", 0.7f * pinkColor);
-            reciever.SetVec3("material.spe", .31f * pinkColor);
-            reciever.SetFloat("material.shi", 10.0f);
-            reciever.SetMat4("model", cube.GetModelMatrix());
-            cube.Draw();
-
-            reciever.SetBool("duck", true);
+            causticMap.GetColorTexture().Bind(GL_TEXTURE0);
+            receiverPositions.GetColorTexture().Bind(GL_TEXTURE1);
+            heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE2);
             reciever.SetVec3("duckPosition", duck.GetPosition());
             reciever.SetFloat("texelSize", 1.0f / res);
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
-            glActiveTexture(GL_TEXTURE0);
+
+
+
+            terrain.Draw(reciever);
+
+            cube.Draw(reciever);
+
+            reciever.SetBool("duck", true);
             duck.Draw(reciever);
 
-
             skybox.Draw(proj, view);
-            reflectionColor.Unbind();
+
+            wave.Use();
+            wave.SetMat4("projection", proj);
+            wave.SetMat4("view", view);
+            wave.SetMat4("model", plane.GetModelMatrix());
+            wave.SetVec3("cameraPosition", camera.GetEye());
+            wave.SetFloat("texelSize", 1.0f / res);
+            heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE0);
+            skybox.Bind(GL_TEXTURE1);
+            refrPos.GetColorTexture().Bind(GL_TEXTURE2);
+            refractionColor.GetColorTexture().Bind(GL_TEXTURE3);
+            reflPos.GetColorTexture().Bind(GL_TEXTURE4);
+            reflectionColor.GetColorTexture().Bind(GL_TEXTURE5);
+            refractionColor.GetDepthTexture().Bind(GL_TEXTURE6);
+            plane.Draw();
         }
-   
 
 
+        //refractions / reflections
+        {
+            {
+                refrPos.Bind();
+
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+                positions.Use();
+                positions.SetBool("duck", false);
+                positions.SetBool("under", true);
+                positions.SetMat4("projection", proj);
+                positions.SetMat4("view", view);
+                positions.SetBool("wave", false);
+                positions.SetBool("inView", false);
+
+                terrain.DrawNoColor(positions);
+
+                cube.DrawNoColor(positions);
+
+                refrPos.Unbind();
+            }
+            {
+                refractionColor.Bind();
+
+                glEnable(GL_DEPTH_TEST);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+                reciever.Use();
+                reciever.SetBool("duck", false);
+                reciever.SetBool("under", true);
+                reciever.SetFloat("waterHeight", 0.0f);
+                reciever.SetVec3("cameraPosition", camera.GetEye());
+                light.Bind(reciever);
+                reciever.SetMat4("projection", proj);
+                reciever.SetMat4("view", view);
+                reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
+                reciever.SetMat4("lightView", light.GetViewMatrix());
+                causticMap.GetColorTexture().Bind(GL_TEXTURE0);
+                receiverPositions.GetColorTexture().Bind(GL_TEXTURE1);
+
+                terrain.Draw(reciever);
+
+                cube.Draw(reciever);
+
+                skybox.Draw(proj, view);
+
+                refractionColor.Unbind();
+            }
+            {
+                reflPos.Bind();
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                positions.Use();
+                positions.SetBool("duck", false);
+                positions.SetBool("under", false);
+                positions.SetMat4("projection", proj);
+                positions.SetMat4("view", view);
+                positions.SetBool("wave", false);
+                positions.SetBool("inView", false);
+
+                terrain.DrawNoColor(positions);
+
+                cube.DrawNoColor(positions);
+
+                positions.SetBool("duck", true);
+                positions.SetVec3("duckPosition", duck.GetPosition());
+                positions.SetFloat("texelSize", 1.0f / res);
+                heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE2);
+                duck.DrawNoColor(positions);
+
+                reflPos.Unbind();
+            }
+            {
+                reflectionColor.Bind();
+                glEnable(GL_DEPTH_TEST);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+                reciever.Use();
+                reciever.SetBool("duck", false);
+                reciever.SetBool("under", false);
+                reciever.SetBool("under", false);
+                reciever.SetFloat("waterHeight", 0.0f);
+                reciever.SetVec3("cameraPosition", camera.GetEye());
+                light.Bind(reciever);
+                reciever.SetMat4("projection", proj);
+                reciever.SetMat4("view", view);
+                reciever.SetMat4("orthogonal", state.GetOrthogonalMatrix());
+                reciever.SetMat4("lightView", light.GetViewMatrix());
+                causticMap.GetColorTexture().Bind(GL_TEXTURE0);
+                receiverPositions.GetColorTexture().Bind(GL_TEXTURE1);
+
+                terrain.Draw(reciever);
+
+                cube.Draw(reciever);
+
+                reciever.SetBool("duck", true);
+                reciever.SetVec3("duckPosition", duck.GetPosition());
+                reciever.SetFloat("texelSize", 1.0f / res);
+                heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE2);
+                duck.Draw(reciever);
 
 
+                skybox.Draw(proj, view);
 
-
-
-
-
+                reflectionColor.Unbind();
+            }
+        }
 
 
         // Debug UI ----------------------------------------------------------------------
         {
             glDisable(GL_DEPTH_TEST);
-
+            glActiveTexture(GL_TEXTURE0);
             displayTexture.Use();
             //BL
-            glBindTexture(GL_TEXTURE_2D, reflectionColor.GetColor());
+            reflectionColor.GetColorTexture().Bind(GL_TEXTURE0);
             debugdlQuad.Draw();
             //BR
-            glBindTexture(GL_TEXTURE_2D, lowPass.GetColor());
+            lowPass.GetColorTexture().Bind(GL_TEXTURE0);
             debugddQuad.Draw();
             //TR
-            glBindTexture(GL_TEXTURE_2D, refractionColor.GetColor());
+            refractionColor.GetColorTexture().Bind(GL_TEXTURE0);
             debugQuad.Draw();
             //TL
-            glBindTexture(GL_TEXTURE_2D, receiverPositions.GetColor());
+            receiverPositions.GetColorTexture().Bind(GL_TEXTURE0);
             debuglQuad.Draw();
 
             crosshair.Draw();
         }
        // --------------------------------------------------------------------------------
 
-
+        // caustics all
+        {
         // positions 
-        receiverPositions.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(1, 1, 1, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            {
+                receiverPositions.Bind();
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(1, 1, 1, 1);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            positions.Use();
-            positions.SetBool("duck", false);
-            positions.SetMat4("projection", state.GetOrthogonalMatrix());
-            positions.SetMat4("view", light.GetViewMatrix());
-            positions.SetBool("wave", false);
-            positions.SetBool("inView", false);
+                positions.Use();
+                positions.SetBool("duck", false);
+                positions.SetMat4("projection", state.GetOrthogonalMatrix());
+                positions.SetMat4("view", light.GetViewMatrix());
+                positions.SetBool("wave", false);
+                positions.SetBool("inView", false);
 
-            terrain.Draw(positions);
+                terrain.DrawNoColor(positions);
 
-            positions.SetMat4("model", cube.GetModelMatrix());
-            cube.Draw();
+                cube.DrawNoColor(positions);
 
-            positions.SetBool("duck", true);
-            positions.SetVec3("duckPosition", duck.GetPosition());
-            positions.SetFloat("texelSize", 1.0f / res);
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
-            glActiveTexture(GL_TEXTURE0);
-            duck.Draw(positions);
-        receiverPositions.Unbind();
+                positions.SetBool("duck", true);
+                positions.SetVec3("duckPosition", duck.GetPosition());
+                positions.SetFloat("texelSize", 1.0f / res);
+                heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE2);
+                duck.DrawNoColor(positions);
+                receiverPositions.Unbind();
+            }
+        
+            //WAVES ONLY HERE
+            // normals
+            {
+                refractiveNormals.Bind();
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(0, 0, 0, 1);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                normals.Use();
+                normals.SetBool("wave", true);
+                normals.SetMat4("projection", state.GetOrthogonalMatrix());
+                normals.SetMat4("view", light.GetViewMatrix());
+                normals.SetMat4("model", plane.GetModelMatrix());
+                normals.SetFloat("texelSize", 1.0f / res);
+                normals.SetBool("inView", false);
+                heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE0);
+                plane.Draw();
+                refractiveNormals.Unbind();
+            }
+            //wave positions
+            {
+                wavePositions.Bind();
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(0, 0, 0, 1);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                positions.Use();
+                positions.SetMat4("projection", state.GetOrthogonalMatrix());
+                positions.SetMat4("view", light.GetViewMatrix());
+                positions.SetMat4("model", plane.GetModelMatrix());
+                positions.SetBool("wave", true);
+                positions.SetBool("inView", false);
+                heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE0);
+                plane.Draw();
+                wavePositions.Unbind();
+            }
+            //caustics
+            {
+                glBlendFunc(GL_ONE, GL_ONE);
+                causticMap.Bind();
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(0.0f, 0.0f, 0.0f, 1);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                caustics.Use();
+                caustics.SetMat4("projection", state.GetOrthogonalMatrix());
+                caustics.SetMat4("view", light.GetViewMatrix());
+                caustics.SetMat4("model", glm::mat4(1.0f));
+                caustics.SetVec3("light.dir", light.m_Dir);
+                //caustics.SetInt("v", nSamples);
+                //caustics.SetVec3("light.pos", glm::vec3(0.0f, 2.0f, 0.0f));
+                receiverPositions.GetColorTexture().Bind(GL_TEXTURE0);
+                refractiveNormals.GetColorTexture().Bind(GL_TEXTURE1);
+                wavePositions.GetColorTexture().Bind(GL_TEXTURE2);
+                grid.Draw();
+                causticMap.Unbind();
+            }
+            //lowpass
+            {
+                lowPass.Bind();
+                glEnable(GL_DEPTH_TEST);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                glClearColor(0, 0, 0, 1);
 
-        // normals
-        {
-            refractiveNormals.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0, 0, 0, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            normals.Use();
-            normals.SetBool("wave", true);
-            normals.SetMat4("projection", state.GetOrthogonalMatrix());
-            normals.SetMat4("view", light.GetViewMatrix());
-            normals.SetMat4("model", plane.GetModelMatrix());
-            normals.SetFloat("texelSize", 1.0f / res);
-            normals.SetBool("inView", false);
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
-            plane.Draw();
-            refractiveNormals.Unbind();
+
+                blur.Use();
+                blur.SetVec2("texelSize", glm::vec2(1.0f / width, 1.0f / height));
+                blur.Use();
+                causticMap.GetColorTexture().Bind(GL_TEXTURE0);
+                quad.Draw();
+                lowPass.Unbind();
+            }
         }
-        //wave positions
-        {
-            wavePositions.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0, 0, 0, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            positions.Use();
-            positions.SetMat4("projection", state.GetOrthogonalMatrix());
-            positions.SetMat4("view", light.GetViewMatrix());
-            positions.SetMat4("model", plane.GetModelMatrix());
-            positions.SetBool("wave", true);
-            positions.SetBool("inView", false);
-            glBindTexture(GL_TEXTURE_2D, heightField[1 - i].GetColor());
-            plane.Draw();
-            wavePositions.Unbind();
-        }
-        //caustics
-        {
-            glBlendFunc(GL_ONE, GL_ONE);
-            causticMap.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0.0f, 0.0f, 0.0f, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            caustics.Use();
-            caustics.SetMat4("projection", state.GetOrthogonalMatrix());
-            caustics.SetMat4("view", light.GetViewMatrix());
-            caustics.SetMat4("model", glm::mat4(1.0f));
-            caustics.SetVec3("light.dir", light.m_Dir);
-            //caustics.SetInt("v", nSamples);
-            //caustics.SetVec3("light.pos", glm::vec3(0.0f, 2.0f, 0.0f));
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, receiverPositions.GetColor());
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, refractiveNormals.GetColor());
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, wavePositions.GetColor());
-            grid.Draw();
-            glActiveTexture(GL_TEXTURE0);
-            causticMap.Unbind();
-        }
 
-
-        i = 1 - i;
-
+      
 
         {
             static float f = 0.0f;
@@ -751,11 +705,12 @@ int Application::Run()
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
         }
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 
-
+        i = 1 - i;
         glfwSwapBuffers(window);
         glfwPollEvents();
 

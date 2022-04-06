@@ -14,6 +14,12 @@
 #include "Texture.h"
 
 
+enum ModelColoring {
+	MATERIAL,
+	MATERIAL_TEXTURE,
+	NONE
+};
+
 class Model
 {
 public:
@@ -29,5 +35,6 @@ private:
 	Material m_Material;
 	Texture m_Texture;
 	glm::vec3 m_Position;
+	ModelColoring m_Coloring;
 };
 

@@ -54,9 +54,6 @@
     <ClCompile Include="src\RenderTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Cubemap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dep\imgui-1.87\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -88,6 +85,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimulationRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -134,9 +137,6 @@
     <ClInclude Include="inc\RenderTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Cubemap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dep\imgui-1.87\imconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -176,6 +176,12 @@
     <ClInclude Include="inc\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimulationRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\gen.vert" />
@@ -201,8 +207,6 @@
     <None Include="shaders\lowpass.frag" />
     <None Include="shaders\drop.vert" />
     <None Include="shaders\drop.frag" />
-    <None Include="shaders\watermask.vert" />
-    <None Include="shaders\watermask.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\caustics.vert" />

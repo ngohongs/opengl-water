@@ -67,6 +67,8 @@ Model::Model(const std::string& path)
     mat.m_Specular = glm::vec3(specular.r, specular.g, specular.b);
     mat.m_Shine = shininess;
 
+
+
     Texture texture;
 
     // get diffuse texture
@@ -78,28 +80,40 @@ Model::Model(const std::string& path)
         m_Texture = texture;
     }
 
+    m_Material = mat;
     m_Geometry = Geometry(vertices, indices);
     m_Position = glm::vec3(0.0f);
+    m_Coloring = MATERIAL_TEXTURE;
 }
 
 Model::Model(const Geometry& geometry, const Material& material)
 {
     m_Geometry = geometry;
     m_Material = material;
+    m_Coloring = MATERIAL;
 }
 
 void Model::Draw(const Shader& shader)
 {
+    if (m_Coloring == MATERIAL || MATERIAL_TEXTURE) {
+        shader.SetVec3("material.amb", m_Material.m_Ambient);
+        shader.SetVec3("material.dif", m_Material.m_Diffuse);
+        shader.SetVec3("material.spe", m_Material.m_Specular);
+        shader.SetFloat("material.shi",m_Material.m_Shine);
+    }
+    if (m_Coloring == MATERIAL_TEXTURE) {
+        shader.SetBool("diffuseUsed", true);
+        m_Texture.Bind(GL_TEXTURE7);
+    }
+
     shader.SetMat4("model", m_Geometry.GetModelMatrix());
-    shader.SetBool("diffuseUsed", m_Texture.Initialized());
-    m_Texture.Bind(GL_TEXTURE7);
-
-
-
 
     m_Geometry.Draw();
-    shader.SetBool("diffuseUsed", false);
-    glActiveTexture(GL_TEXTURE0);
+
+    if (m_Coloring == MATERIAL_TEXTURE) {
+        shader.SetBool("diffuseUsed", false);
+        glActiveTexture(GL_TEXTURE0);
+    }
 }
 
 void Model::DrawNoColor(const Shader& shader)

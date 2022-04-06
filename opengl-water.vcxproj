@@ -159,8 +159,9 @@
     <ClCompile Include="dep\imgui-1.87\imgui_impl_win32.cpp" />
     <ClCompile Include="dep\imgui-1.87\imgui_tables.cpp" />
     <ClCompile Include="dep\imgui-1.87\imgui_widgets.cpp" />
+    <ClCompile Include="SimulationRenderer.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Material.cpp" />
-    <ClCompile Include="src\Cubemap.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\Light.cpp" />
@@ -188,7 +189,6 @@
     <ClInclude Include="dep\imgui-1.87\imstb_rectpack.h" />
     <ClInclude Include="dep\imgui-1.87\imstb_textedit.h" />
     <ClInclude Include="dep\imgui-1.87\imstb_truetype.h" />
-    <ClInclude Include="inc\Cubemap.h" />
     <ClInclude Include="inc\Crosshair.h" />
     <ClInclude Include="inc\Application.h" />
     <ClInclude Include="inc\Cube.h" />
@@ -206,6 +206,8 @@
     <ClInclude Include="inc\Light.h" />
     <ClInclude Include="inc\RenderTarget.h" />
     <ClInclude Include="inc\Material.h" />
+    <ClInclude Include="inc\Renderer.h" />
+    <ClInclude Include="SimulationRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\caustics.frag" />
@@ -227,8 +229,6 @@
     <None Include="shaders\reciever.vert" />
     <None Include="shaders\skybox.frag" />
     <None Include="shaders\skybox.vert" />
-    <None Include="shaders\watermask.frag" />
-    <None Include="shaders\watermask.vert" />
     <None Include="shaders\wave.frag" />
     <None Include="shaders\wave.vert" />
     <None Include="shaders\waveProcess.frag" />
