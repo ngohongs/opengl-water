@@ -1,26 +1,27 @@
 #version 420 core
-layout (location = 0) in vec3 aPos;   // the position variable has attribute position 0
-layout (location = 2) in vec2 texCoord;   // the position variable has attribute position 0
+layout (location = 0) in vec3 aPosition;   // the position variable has attribute position 0
+layout (location = 2) in vec2 aTexCoord;   // the position variable has attribute position 0
 
 
-out vec4 fPos;
+
 
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+
 uniform bool wave;
 
-uniform sampler2D tex;
-
-uniform bool inView;
+layout(binding=0) uniform sampler2D heightField;
 
 uniform bool under;
 
-layout(binding=2) uniform sampler2D heightfield;
-uniform bool duck;
-uniform vec3 duckPosition;
 uniform float texelSize;
 
+uniform bool duck;
+uniform vec3 duckPosition;
+
+
+out vec4 fPosition;
 
  mat4 rotate(mat4 m, float angle, vec3 v) {
 	float a = angle;
@@ -60,11 +61,11 @@ vec3 calcDuckYAxis() {
     vec2 ny = vec2(0, -texelSize);
 
 
-    float r = texture(heightfield, duckUV + px).r;
-    float l = texture(heightfield, duckUV + nx).r;
-    float t = texture(heightfield, duckUV + py).r;
-    float b = texture(heightfield, duckUV + ny).r;
-    float m = texture(heightfield, duckUV).r;
+    float r = texture(heightField, duckUV + px).r;
+    float l = texture(heightField, duckUV + nx).r;
+    float t = texture(heightField, duckUV + py).r;
+    float b = texture(heightField, duckUV + ny).r;
+    float m = texture(heightField, duckUV).r;
 
     vec3 hor = vec3(2 * texelSize ,r - l,0);
     vec3 ver = vec3(0,t - b,2 * texelSize);
@@ -88,12 +89,12 @@ mat4 duckRotateMatrix() {
 
 float duckHeight() {
     vec2 duckUV = 0.5 * duckPosition.xz + 0.5f;
-    return texture(heightfield, duckUV).r;
+    return texture(heightField, duckUV).r;
 }
 
 void main()
 {
-    float height = texture(tex, texCoord).r;
+    float height = texture(heightField, aTexCoord).r;
     vec3 offset = vec3(0.0, height, 0.0);
 
 
@@ -101,11 +102,11 @@ void main()
 
     if (wave)
     {
-        position = vec4(aPos + offset, 1.0);
+        position = vec4(aPosition + offset, 1.0);
     }
     else
     {
-        position = vec4(aPos, 1.0);
+        position = vec4(aPosition, 1.0);
         if (duck)
             position = duckRotateMatrix() * (position + vec4(0.0f, 5.0f * duckHeight(), 0.0f, 0.0f));
     }
@@ -113,13 +114,9 @@ void main()
     vec4 worldc = model * position;
     vec4 viewc = view * worldc;
     vec4 projc = projection * viewc;
-
-    if (inView) { 
-        fPos = viewc;
-    }
-    else {
-        fPos = worldc;
-    }
+   
+    fPosition = worldc;
+    
 
     if (under)
         gl_ClipDistance[0] = dot(worldc, vec4(0,-1,0,0.005));

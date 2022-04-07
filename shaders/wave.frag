@@ -29,22 +29,6 @@ uniform vec3 cameraPosition;
 
 const float eta = 1.00 / 1.52;
 
-float LinearizeDepth(float depth) 
-{
-    float far = 1000.0f;
-    float near = 0.1f;
-    float z = depth * 2.0 - 1.0; // back to NDC 
-    return (2.0 * near * far) / (far + near - z * (far - near));	
-}
-
-vec2 calculateRefractUV(vec3 normal) {
-    vec3 viewDir = normalize(fPosition - cameraPosition);
-    vec3 refractDir = refract(viewDir, normal, eta);
-    vec3 finalDir = normalize(viewDir + refractDir); // 
-    vec4 clipSpaceDir = projection * view * vec4(finalDir, 1.0);
-    vec2 texC = 0.5 * (clipSpaceDir.xy/clipSpaceDir.w) + 0.5;
-    return texC;
-}
 
 vec2 EstimateIntersection(vec3 v, vec3 r, vec3 normal, sampler2D positions) {
 	vec3 p1 = v + 0.1 * (1 - dot(normal, normalize(toCameraDir))) * r;
@@ -83,29 +67,22 @@ void main()
     vec3 hor = vec3(2 * texelSize ,r - l,0);
     vec3 ver = vec3(0,t - b,2 * texelSize);
 
-    //vec3 normal = normalize(texture(normalMap, fTexCoord).xyz);
-
     vec3 normal = normalize(cross(ver, hor));
-
     normal = normalize(mat3(transpose(inverse(model))) * normal);
 
-    //if (cameraPosition.y < fPosition.y)
-    //    normal = -normal;
+    if (cameraPosition.y < fPosition.y)
+        normal = -normal;
 
     vec3 viewDir = normalize(fPosition - cameraPosition);
     vec3 reflectDir = normalize(reflect(viewDir, normal));
     vec3 refractDir = normalize(refract(viewDir, normal, eta));
 
-    vec4 reflectColor = texture(environment, reflectDir);
-   // vec4 refractColor = texture(environment, refractDir);
-	//vec4 refractColor = texture(belowSurface, calculateRefractUV(normal));
     
-	//GOOD ------------------
 	vec2 refractedUV = EstimateIntersection(fWorldCoord.xyz, refractDir, normal, positionsRefracted);
     vec4 refractedColor = texture(colorRefracted, refractedUV);
     if (refractedUV.x < 0.0f)
         refractedColor = mix(texture(environment, refractDir), texture(environment, viewDir), 0.3);
-	//-----------------------
+
 
 	vec2 reflectedUV = EstimateIntersection(fWorldCoord.xyz, reflectDir, normal, positionsReflected);
     vec4 reflectedColor = texture(colorReflected, reflectedUV);
@@ -122,7 +99,8 @@ void main()
     float rp = ((n2*ct-n1*ci)/(n2*ct+n1*ci)) * ((n2*ct-n1*ci)/(n2*ct+n1*ci));
 
     float rc = 1 - (rs+rp) / 2;
-    float fresnel = dot(normalize(toCameraDir), normal);
+
+    //float fresnel = dot(normalize(toCameraDir), normal);
     vec3 color = mix(reflectedColor, refractedColor, rc).rgb;
 	vec3 waterColor = vec3(2.0f, 204.0f, 147.0f) / 255.0f;
     FragColor = vec4(vec3(mix(color, waterColor, 0.025f)), 1.0f);

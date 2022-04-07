@@ -13,8 +13,6 @@ uniform float texelSize;
 
 uniform bool wave;
 
-uniform bool inView;
-
 void main()
 {   
     vec2 px = vec2(texelSize, 0);
@@ -39,11 +37,9 @@ void main()
     else {
         normal = normalize(fNormal);
     }
-    if (inView) {
-        normal = normalize(mat3(transpose(inverse(view * model))) * normal);
-    }
-    else {
-        normal = normalize(mat3(transpose(inverse(model))) * normal);
-    }
+ 
+ 
+    normal = normalize(mat3(transpose(inverse(model))) * normal);
+
     FragColor = vec4(normal, 1.0);
 }

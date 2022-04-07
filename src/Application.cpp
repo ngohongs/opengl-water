@@ -253,16 +253,16 @@ int Application::Run()
             glActiveTexture(GL_TEXTURE0);
             displayTexture.Use();
             //BL
-            cauticsRenderer.Result().Bind(GL_TEXTURE0);
+            state.m_RecieverPositions.Bind(GL_TEXTURE7);
             state.m_Geometry["debugdlQuad"].Draw();
             //BR
-            state.m_Refractions.Bind(GL_TEXTURE0);
+            state.m_Refractions.Bind(GL_TEXTURE7);
             state.m_Geometry["debugddQuad"].Draw();
             //TR
-            state.m_Reflections.Bind(GL_TEXTURE0);
+            state.m_Reflections.Bind(GL_TEXTURE7);
             state.m_Geometry["debugQuad"].Draw();
             //TL
-            state.m_HeightField.Bind(GL_TEXTURE0);
+            state.m_HeightField.Bind(GL_TEXTURE7);
             state.m_Geometry["debuglQuad"].Draw();
 
             crosshair.Draw();

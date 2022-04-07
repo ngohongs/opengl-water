@@ -58,7 +58,6 @@ void SceneRenderer::Render()
             m_Positions.SetMat4("projection", state.m_ProjectionMatrix);
             m_Positions.SetMat4("view", state.m_Camera.GetViewMatrix());
             m_Positions.SetBool("wave", false);
-            m_Positions.SetBool("inView", false);
 
             state.m_Models["terrain"].DrawNoColor(m_Positions);
 
@@ -105,7 +104,6 @@ void SceneRenderer::Render()
             m_Positions.SetMat4("projection", state.m_ProjectionMatrix);
             m_Positions.SetMat4("view", state.m_Camera.GetViewMatrix());
             m_Positions.SetBool("wave", false);
-            m_Positions.SetBool("inView", false);
 
             state.m_Models["terrain"].DrawNoColor(m_Positions);
 
@@ -114,7 +112,7 @@ void SceneRenderer::Render()
             m_Positions.SetBool("duck", true);
             m_Positions.SetVec3("duckPosition", state.m_Models["duck"].GetPosition());
             m_Positions.SetFloat("texelSize", 1.0f / state.m_Res);
-            state.m_HeightField.Bind(GL_TEXTURE2);
+            state.m_HeightField.Bind(GL_TEXTURE0);
             state.m_Models["duck"].DrawNoColor(m_Positions);
 
             m_ReflectionsPositions.Unbind();

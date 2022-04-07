@@ -1,7 +1,7 @@
-#version 330 core
-layout (location = 0) in vec2 aPos;   // the position variable has attribute position 0
+#version 420 core
+layout (location = 0) in vec2 aPosition;  
 
 void main()
 {
-    gl_Position = vec4(aPos, 0.0, 1.0);
+    gl_Position = vec4(aPosition, 0.0, 1.0);
 }   

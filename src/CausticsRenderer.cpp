@@ -40,35 +40,37 @@ void CausticsRenderer::Render()
         // positions 
         {
             m_ReceiverPositions.Bind();
+
             glEnable(GL_DEPTH_TEST);
-            glClearColor(1, 1, 1, 1);
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             m_Positions.Use();
+
+            state.m_HeightField.Bind(GL_TEXTURE0);
+            m_Positions.SetFloat("texelSize", 1.0f / state.m_Res);
+
             m_Positions.SetBool("duck", false);
+
             m_Positions.SetMat4("projection", state.m_OrthogonalMatrix);
             m_Positions.SetMat4("view", state.m_Light.GetViewMatrix());
             m_Positions.SetBool("wave", false);
-            m_Positions.SetBool("inView", false);
 
             state.m_Models["terrain"].DrawNoColor(m_Positions);
-
             state.m_Models["cube"].DrawNoColor(m_Positions);
 
             m_Positions.SetBool("duck", true);
             m_Positions.SetVec3("duckPosition", state.m_Models["duck"].GetPosition());
-            m_Positions.SetFloat("texelSize", 1.0f / state.m_Res);
-            state.m_HeightField.Bind(GL_TEXTURE2);
+         
             state.m_Models["duck"].DrawNoColor(m_Positions);
             m_ReceiverPositions.Unbind();
         }
 
-        //WAVES ONLY HERE
         // normals
         {
             m_RefractiveNormals.Bind();
             glEnable(GL_DEPTH_TEST);
-            glClearColor(0, 0, 0, 1);
+            glClearColor(0, 0, 0, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             m_Normals.Use();
             m_Normals.SetBool("wave", true);
@@ -76,7 +78,6 @@ void CausticsRenderer::Render()
             m_Normals.SetMat4("view", state.m_Light.GetViewMatrix());
             m_Normals.SetMat4("model", state.m_Geometry["plane"].GetModelMatrix());
             m_Normals.SetFloat("texelSize", 1.0f / state.m_Res);
-            m_Normals.SetBool("inView", false);
             state.m_HeightField.Bind(GL_TEXTURE0);
             state.m_Geometry["plane"].Draw();
             m_RefractiveNormals.Unbind();
@@ -85,14 +86,13 @@ void CausticsRenderer::Render()
         {
             m_RefractivePositions.Bind();
             glEnable(GL_DEPTH_TEST);
-            glClearColor(0, 0, 0, 1);
+            glClearColor(0, 0, 0, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             m_Positions.Use();
             m_Positions.SetMat4("projection", state.m_OrthogonalMatrix);
             m_Positions.SetMat4("view", state.m_Light.GetViewMatrix());
             m_Positions.SetMat4("model", state.m_Geometry["plane"].GetModelMatrix());
             m_Positions.SetBool("wave", true);
-            m_Positions.SetBool("inView", false);
             state.m_HeightField.Bind(GL_TEXTURE0);
             state.m_Geometry["plane"].Draw();
             m_RefractivePositions.Unbind();
@@ -109,8 +109,6 @@ void CausticsRenderer::Render()
             m_Caustics.SetMat4("view", state.m_Light.GetViewMatrix());
             m_Caustics.SetMat4("model", glm::mat4(1.0f));
             m_Caustics.SetVec3("light.dir", state.m_Light.m_Dir);
-            //m_Caustics.SetInt("v", nSamples);
-            //m_Caustics.SetVec3("state.m_Light.pos", glm::vec3(0.0f, 2.0f, 0.0f));
             m_ReceiverPositions.GetColorTexture().Bind(GL_TEXTURE0);
             m_RefractiveNormals.GetColorTexture().Bind(GL_TEXTURE1);
             m_RefractivePositions.GetColorTexture().Bind(GL_TEXTURE2);

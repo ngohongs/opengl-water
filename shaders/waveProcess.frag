@@ -46,16 +46,6 @@ void main()
 
     float nsum = vpdx + vndx + vpdy + vndy;
     float average =  (vpdx + vndx + vpdy + vndy) / 4.0;
-    
-    
-   /*
-    float old_u = old_info.r + heightWithDrop(texCoord);
-    float old_v = old_info.g;
-    float new_v = old_v + average - old_u;
-    new_v *= 0.99;
-    float new_u = old_u + new_v;
-    */
-
 
     
     float h = texelSize;
