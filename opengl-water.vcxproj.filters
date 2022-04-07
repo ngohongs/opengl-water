@@ -90,7 +90,13 @@
     <ClCompile Include="src\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SimulationRenderer.cpp">
+    <ClCompile Include="src\SimulationRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CausticsRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -179,13 +185,17 @@
     <ClInclude Include="inc\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SimulationRenderer.h">
+    <ClInclude Include="inc\SimulationRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CausticsRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\SceneRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\gen.vert" />
-    <None Include="shaders\gen.frag" />
     <None Include="shaders\crosshair.vert" />
     <None Include="shaders\crosshair.frag" />
     <None Include="shaders\wave.vert" />
@@ -205,8 +215,6 @@
     <None Include="shaders\reciever.frag" />
     <None Include="shaders\lowpass.vert" />
     <None Include="shaders\lowpass.frag" />
-    <None Include="shaders\drop.vert" />
-    <None Include="shaders\drop.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\caustics.vert" />

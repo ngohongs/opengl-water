@@ -22,6 +22,11 @@
 #include "Light.h"
 #include "RenderTarget.h"
 #include "Model.h"
+
+#include "SimulationRenderer.h"
+#include "CausticsRenderer.h"
+#include "SceneRenderer.h"
+
 class Application
 {
 public:

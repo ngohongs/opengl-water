@@ -8,6 +8,7 @@ class Geometry
 {
 public:
 	Geometry();
+	Geometry(const std::vector<Vertex>& verts);
 	Geometry(const std::vector<Vertex>& verts, const std::vector<unsigned int>& ind);
 	Geometry(const float* verts, const int& vertCnt, const unsigned int * tri, const int& triCnt);
 	void Load(const std::vector<Vertex>& verts, const std::vector<unsigned int>& ind);

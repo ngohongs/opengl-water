@@ -1,11 +1,11 @@
 #include "RenderTarget.h"
 #include <iostream>
 
-RenderTarget::RenderTarget(const int& width, const int& height)
+RenderTarget::RenderTarget()
 {
-	glGenFramebuffers(1, &m_FBO);
-	m_Width = width;
-	m_Height = height;
+    m_FBO = 0;
+    m_Width = 0;
+    m_Height = 0;
     m_ColorTexture = 0;
     m_DepthTexture = 0;
     m_RBO = 0;
@@ -76,7 +76,7 @@ void RenderTarget::Bind()
 void RenderTarget::Unbind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, state.GetWindow().GetWidth(), state.GetWindow().GetHeight());
+    glViewport(0, 0, state.m_Window.GetWidth(), state.m_Window.GetHeight());
 }
 
 GLuint RenderTarget::GetFBO() const

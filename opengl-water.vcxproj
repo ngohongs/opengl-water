@@ -151,6 +151,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\CausticsRenderer.cpp" />
     <ClCompile Include="dep\imgui-1.87\imgui.cpp" />
     <ClCompile Include="dep\imgui-1.87\imgui_demo.cpp" />
     <ClCompile Include="dep\imgui-1.87\imgui_draw.cpp" />
@@ -159,7 +160,8 @@
     <ClCompile Include="dep\imgui-1.87\imgui_impl_win32.cpp" />
     <ClCompile Include="dep\imgui-1.87\imgui_tables.cpp" />
     <ClCompile Include="dep\imgui-1.87\imgui_widgets.cpp" />
-    <ClCompile Include="SimulationRenderer.cpp" />
+    <ClCompile Include="src\SceneRenderer.cpp" />
+    <ClCompile Include="src\SimulationRenderer.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Model.cpp" />
@@ -179,6 +181,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\CausticsRenderer.h" />
     <ClInclude Include="dep\imgui-1.87\imconfig.h" />
     <ClInclude Include="dep\imgui-1.87\imgui.h" />
     <ClInclude Include="dep\imgui-1.87\imgui_impl_glfw.h" />
@@ -196,6 +199,8 @@
     <ClInclude Include="inc\Camera.h" />
     <ClInclude Include="inc\Model.h" />
     <ClInclude Include="inc\Quad.h" />
+    <ClInclude Include="inc\SceneRenderer.h" />
+    <ClInclude Include="inc\SimulationRenderer.h" />
     <ClInclude Include="inc\Texture.h" />
     <ClInclude Include="inc\Vertex.h" />
     <ClInclude Include="inc\Shader.h" />
@@ -207,7 +212,6 @@
     <ClInclude Include="inc\RenderTarget.h" />
     <ClInclude Include="inc\Material.h" />
     <ClInclude Include="inc\Renderer.h" />
-    <ClInclude Include="SimulationRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\caustics.frag" />
@@ -215,10 +219,6 @@
     <None Include="shaders\crosshair.vert" />
     <None Include="shaders\displaytexture.frag" />
     <None Include="shaders\displaytexture.vert" />
-    <None Include="shaders\drop.frag" />
-    <None Include="shaders\drop.vert" />
-    <None Include="shaders\gen.frag" />
-    <None Include="shaders\gen.vert" />
     <None Include="shaders\lowpass.frag" />
     <None Include="shaders\lowpass.vert" />
     <None Include="shaders\normals.frag" />

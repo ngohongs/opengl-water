@@ -11,8 +11,15 @@ const float PI = 3.14159265359;
 
 uniform bool abort;
 
-
-uniform int size;
+float height(vec2 pos)
+{
+    if (!drop)
+        return 0.0;
+    float radius = 1.5 * texelSize;
+	float val = max(0.0, 1.0 - length(dropPos - pos) / radius);
+    val = 0.5 - cos(val * PI) * 0.5;
+    return 0.05 * val;
+}
 
 void main()
 {
@@ -20,6 +27,7 @@ void main()
         FragColor = vec4(vec3(0.0), 1.0);
         return;
     }
+
     vec2 texCoord = UV;
     vec4 old_info = texture(tex, texCoord);
 
@@ -31,10 +39,10 @@ void main()
     vec2 pdy = texCoord + offsetY;
     vec2 ndy = texCoord - offsetY;
 
-    float vpdx = texture(tex, pdx).r;
-    float vndx = texture(tex, ndx).r;
-    float vpdy = texture(tex, pdy).r;
-    float vndy = texture(tex, ndy).r;
+    float vpdx = texture(tex, pdx).r + height(pdx);
+    float vndx = texture(tex, ndx).r + height(ndx);
+    float vpdy = texture(tex, pdy).r + height(pdy);
+    float vndy = texture(tex, ndy).r + height(ndy);
 
     float nsum = vpdx + vndx + vpdy + vndy;
     float average =  (vpdx + vndx + vpdy + vndy) / 4.0;
@@ -51,8 +59,7 @@ void main()
 
     
     float h = texelSize;
-    h = 1.0f / size;
-    float old_u = old_info.r;// + height(texCoord);
+    float old_u = old_info.r + height(texCoord);// + height(texCoord);
     float old_v = old_info.g;
 
 

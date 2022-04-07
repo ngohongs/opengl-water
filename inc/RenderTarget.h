@@ -15,7 +15,7 @@ enum RTType {
 class RenderTarget
 {
 public:
-	RenderTarget(const int& width, const int& height);
+	RenderTarget();
 	RenderTarget(const int& width, const int& height, const RTType & type, const TextureFilter& filter = TextureFilter::LINEAR);
 	void AttachColor(TextureFilter filter = TextureFilter::LINEAR);
 	void AttachDepth(TextureFilter filter = TextureFilter::LINEAR);

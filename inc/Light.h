@@ -6,6 +6,7 @@
 struct Light
 {
 public:
+	Light() = default;
 	Light(const glm::vec3& pos, const glm::vec3& dir, const glm::vec3& up,
 		  const glm::vec3& amb, const glm::vec3& dif, const glm::vec3& spe);
 	glm::mat4 GetViewMatrix() const;

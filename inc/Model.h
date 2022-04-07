@@ -23,6 +23,7 @@ enum ModelColoring {
 class Model
 {
 public:
+	Model() = default;
 	Model(const std::string& path);
 	Model(const Geometry& geometry, const Material& material);
 	void Draw(const Shader& shader);

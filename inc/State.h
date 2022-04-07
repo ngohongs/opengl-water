@@ -1,55 +1,67 @@
 #pragma once
+#include <map>
+#include <string>
+#include <vector>
 #include "Camera.h"
 #include "Window.h"
-
-
+#include "Model.h";
+#include "PlaneGenerator.h"
+#include "Geometry.h"
+#include "Cube.h"
+#include "Quad.h"
+#include "Light.h"
+#include "Skybox.h"
 extern void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 extern void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 extern void processInput();
 
 enum { M1, KEY_COUNT };
 
-class State
+struct State
 {
 public:
 	State() = default;
 	State(const int& width, const int& height);
 	int Init();
-	Window& GetWindow();
-	Camera& GetCamera();
-	glm::mat4 GetProjectionMatrix() const;
-	glm::mat4 GetOrthogonalMatrix() const;
-	void SetDropPos(const glm::vec2& q);
-	glm::vec2 GetDropPos() const;
-	void SetDropTest(const bool& q);
-	bool GetDropTest() const;
-	void SetAbort(const bool& q);
-	bool GetAbort() const;
-	bool GetNormalDisplay() const;
-	void ToggleNormalDisplay();
-	float GetDeltaTime() const;
+	glm::mat4 m_ProjectionMatrix;
+	glm::mat4 m_OrthogonalMatrix;
 	void Update();
 	bool m_KeyMap[KEY_COUNT] = { false };
 	bool m_M1Prev = false;
-private:
+	std::map<std::string, Model> m_Models;
+	std::map<std::string, Geometry> m_Geometry;
+	int m_Res;
+	Light m_Light;
+	void GenerateGeometriesModels();
+	Texture m_HeightField;
+	Texture m_CausticMap;
+	Texture m_RefractionsPositions;
+	Texture m_ReflectionsPositions;
+	Texture m_Reflections;
+	Texture m_Refractions;
+	Texture m_RecieverPositions;
+	Texture m_WaterNormals;
+	Texture m_Filtered;
+	Texture m_RefractivePositions;
+	Texture m_RefractiveNormals;
 	float m_DeltaTime;
+	bool m_Abort;
+	glm::vec2 m_DropPos;
+	Camera m_Camera;
+	Window m_Window;
+	bool m_DropTest;
+private:
 	float m_NowTime;
 	float m_LastTime;
-	glm::vec2 m_DropPos;
-	bool m_DropTest;
-	bool m_Abort;
-	Window m_Window;
-	Camera m_Camera;
+	
 	float m_FOV;
 	double m_LastX;
 	double m_LastY;
 	bool m_FirstMouse;
-	bool m_NormalDisplay;
+
 	friend void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 	friend void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 	friend void processInput();
-
-	
 };
 
 extern State state;

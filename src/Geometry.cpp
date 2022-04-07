@@ -1,14 +1,28 @@
 #include "Geometry.h"
 
+#include <iostream>
 Geometry::Geometry()
 {
-	glGenVertexArrays(1, &m_VAO);
+	m_VAO = 0;
 	m_VBO = 0;
 	m_EBO = 0;
 	m_VertCnt = 0;
 	m_IndCnt = 0;
 	m_Pos = glm::vec3(0.0f);
 	m_Scale = glm::vec3(1.0f);
+}
+
+Geometry::Geometry(const std::vector<Vertex>& verts)
+{
+	m_VAO = 0;
+	m_VBO = 0;
+	m_EBO = 0;
+	m_VertCnt = 0;
+	m_IndCnt = 0;
+	m_Pos = glm::vec3(0.0f);
+	m_Scale = glm::vec3(1.0f);
+	glGenVertexArrays(1, &m_VAO);
+	LoadGrid(verts);
 }
 
 Geometry::Geometry(const std::vector<Vertex>& verts, const std::vector<unsigned int>& ind)
@@ -76,7 +90,7 @@ void Geometry::Load(const float* verts, const int& vertCnt, const unsigned int *
 void Geometry::LoadGrid(const std::vector<Vertex>& verts)
 {
 	glGenBuffers(1, &m_VBO);
-
+	
 	glBindVertexArray(m_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vertex), &verts[0], GL_STATIC_DRAW);
