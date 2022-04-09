@@ -1,21 +1,24 @@
 #pragma once
+
 #include <map>
 #include <string>
 #include <vector>
+
 #include "Camera.h"
 #include "Window.h"
-#include "Model.h";
+#include "Model.h"
 #include "PlaneGenerator.h"
 #include "Geometry.h"
 #include "Cube.h"
 #include "Quad.h"
 #include "Light.h"
 #include "Skybox.h"
+
 extern void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 extern void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 extern void processInput();
 
-enum { M1, KEY_COUNT };
+enum { M1, E, KEY_COUNT };
 
 struct State
 {
@@ -27,7 +30,9 @@ public:
 	glm::mat4 m_OrthogonalMatrix;
 	void Update();
 	bool m_KeyMap[KEY_COUNT] = { false };
-	bool m_M1Prev = false;
+	bool m_M1Prev;
+	bool m_EPrev;
+	bool m_CursorMode;
 	std::map<std::string, Model> m_Models;
 	std::map<std::string, Geometry> m_Geometry;
 	int m_Res;
@@ -51,6 +56,21 @@ public:
 	Window m_Window;
 	bool m_DropTest;
 
+	bool m_Stop;
+
+	float m_Attenuation;
+	float m_FirstStage;
+	float m_SecondStage;
+	glm::vec3 m_FirstStageColor;
+	glm::vec3 m_SecondStageColor;
+	glm::vec3 m_FinalStageColor;
+
+
+	float m_BedHeight;
+	float m_CubeHeight;
+	glm::vec3 m_CubeColor;
+
+
 	float m_Radius;
 	float m_Amplitude;
 
@@ -62,14 +82,7 @@ public:
 	float m_CausticsPower;
 
 	float m_FirstGuess;
-
-	float m_FirstStage;
-	float m_SecondStage;
-	glm::vec3 m_FirstStageColor;
-	glm::vec3 m_SecondStageColor;
-	glm::vec3 m_FinalStageColor;
-	float m_Attenuation;
-
+	void Reset();
 private:
 	float m_NowTime;
 	float m_LastTime;

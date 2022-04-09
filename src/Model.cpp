@@ -1,5 +1,4 @@
 #include "Model.h"
-#include "..\inc\Model.h"
 
 Model::Model(const std::string& path)
 {

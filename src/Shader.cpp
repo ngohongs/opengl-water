@@ -5,6 +5,7 @@ Shader::Shader()
 	m_ID = glCreateProgram();
 	for (int i = 0; i < 3; i++)
 		m_Shaders[i] = 0;
+	m_Name = "";
 }
 
 
@@ -62,6 +63,8 @@ GLuint Shader::AttachShader(ShaderEnum type, const std::string& path)
 		break;
 	}
 
+	m_Name += path;
+
 	return shader;
 }
 
@@ -75,7 +78,7 @@ bool Shader::LinkProgram()
 	if (!success)
 	{
 		glGetProgramInfoLog(m_ID, 512, nullptr, log);
-		std::cout << "ERROR: shader linking failed\n" << log << std::endl;
+		std::cout << "ERROR: shader linking failed " << m_Name << "\n" << log << std::endl;
 		return false;
 	}
 
@@ -88,7 +91,6 @@ bool Shader::LinkProgram()
 		}
 	}
 	
-	std::cout << "LINK success " << m_ID << std::endl;
 	return true;
 }
 

@@ -1,6 +1,8 @@
 #pragma once
+
 #include "GL/glew.h"
 #include "Shader.h"
+
 const float crossVert[] = {
         -0.009f, 0.0f,
          0.009f, 0.0f,
@@ -17,7 +19,6 @@ public:
 private:
     GLuint m_VAO;
     GLuint m_VBO;
-    GLuint m_EBO;
     Shader m_Shader;
 };
 

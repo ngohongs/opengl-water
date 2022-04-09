@@ -1,4 +1,4 @@
-#include "..\inc\Texture.h"
+#include "Texture.h"
 
 Texture::Texture()
 {
@@ -46,7 +46,6 @@ Texture::Texture(const std::string& path)
     m_Height = height;
     if (data)
     {
-        std::cout << "Generating texture at path: " << path << std::endl;
         GLenum format = GL_RGB;
         if (nrComponents == 1)
             format = GL_RED;

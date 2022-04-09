@@ -7,9 +7,9 @@ SimulationRenderer::SimulationRenderer()
 	m_HeightField[0] = RenderTarget{ state.m_Res, state.m_Res, COLOR, LINEAR };
 	m_HeightField[1] = RenderTarget{ state.m_Res, state.m_Res, COLOR, LINEAR };
 
-    std::cout << m_SimulationShader.AttachShader(VERTEX, "shaders/waveProcess.vert") << std::endl;
-    std::cout << m_SimulationShader.AttachShader(FRAGMENT, "shaders/waveProcess.frag") << std::endl;
-    std::cout << "SIM " << m_SimulationShader.LinkProgram() << std::endl;
+    m_SimulationShader.AttachShader(VERTEX, "shaders/waveProcess.vert");
+    m_SimulationShader.AttachShader(FRAGMENT, "shaders/waveProcess.frag");
+    m_SimulationShader.LinkProgram();
 
     state.m_HeightField = m_HeightField[0].GetColorTexture();
 

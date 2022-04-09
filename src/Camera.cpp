@@ -63,8 +63,8 @@ void Camera::Rotate(double xoffset, double yoffset)
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
 
-	m_Yaw += xoffset;
-	m_Pitch += yoffset;
+	m_Yaw += (float) xoffset;
+	m_Pitch += (float) yoffset;
 
 	if (m_Pitch > 89.0f)
 		m_Pitch = 89.0f;
@@ -74,7 +74,6 @@ void Camera::Rotate(double xoffset, double yoffset)
 		m_Yaw -= 360.0f;
 	if (m_Yaw < -450.0f)
 		m_Yaw += 360.0f;
-		
 
 	glm::vec3 direction;
 	direction.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
@@ -95,7 +94,7 @@ void Camera::SetUp(const glm::vec3& up)
 
 void Camera::SetDirection(const glm::vec3& dir)
 {
-	m_Direction = dir;
+	m_Direction = glm::normalize(dir);
 }
 
 glm::vec3 Camera::GetEye() const

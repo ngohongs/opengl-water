@@ -1,5 +1,4 @@
 #include "RenderTarget.h"
-#include <iostream>
 
 RenderTarget::RenderTarget()
 {

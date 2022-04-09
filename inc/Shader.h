@@ -1,12 +1,13 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
+
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
+#include "iostream"
+#include "fstream"
+#include "sstream"
+#include "string"
 
 enum ShaderEnum {
 	VERTEX = GL_VERTEX_SHADER,
@@ -29,6 +30,7 @@ public:
 	void SetVec4(const std::string& name, glm::vec4 value) const;
 	void SetMat4(const std::string& name, const glm::mat4& value) const;
 private:
+	std::string m_Name;
 	GLuint m_ID;
 	GLuint m_Shaders[3];
 };

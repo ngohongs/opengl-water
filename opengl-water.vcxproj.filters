@@ -87,9 +87,6 @@
     <ClCompile Include="src\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\SimulationRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,9 +108,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Application.h">
@@ -194,6 +188,9 @@
     <ClInclude Include="inc\SceneRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\crosshair.vert" />
@@ -206,8 +203,6 @@
     <None Include="shaders\skybox.frag" />
     <None Include="shaders\positions.vert" />
     <None Include="shaders\positions.frag" />
-    <None Include="shaders\displaytexture.vert" />
-    <None Include="shaders\displaytexture.frag" />
     <None Include="shaders\normals.vert" />
     <None Include="shaders\normals.frag" />
     <None Include="shaders\caustics.frag" />

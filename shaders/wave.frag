@@ -11,7 +11,7 @@ uniform float texelSize;
 uniform float firstGuess;
 
 uniform vec3 cameraPosition;
-uniform vec3 waterColor;
+uniform vec3 firstStageColor;
 
 layout(binding=0) uniform sampler2D heightField;
 layout(binding=1) uniform samplerCube environment;
@@ -92,6 +92,6 @@ void main()
     float rc = 1 - (rs+rp) / 2;
 
     vec3 color = mix(reflectedColor, refractedColor, rc).rgb;
-	vec3 waterColor = vec3(2.0f, 204.0f, 147.0f) / 255.0f;
+	vec3 waterColor = firstStageColor;
     FragColor = vec4(vec3(mix(color, waterColor, 0.025f)), 1.0f);
 }

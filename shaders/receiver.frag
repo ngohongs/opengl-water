@@ -23,9 +23,16 @@ struct Material {
 
 uniform Light light;
 uniform Material material;
+uniform float attenuation;
+uniform float firstStage;
+uniform float secondStage;
+uniform vec3 firstStageColor;
+uniform vec3 secondStageColor;
+uniform vec3 finalStageColor;
 uniform vec3 cameraPosition;
 uniform float waterHeight;
-uniform bool diffuseUsed = false;
+uniform bool diffuseUsed;
+
 layout(binding=0) uniform sampler2D causticMap;
 layout(binding=1) uniform sampler2D positions;
 layout(binding=7) uniform sampler2D diffuseTexture;
@@ -41,38 +48,29 @@ vec3 dirCalc() {
 	float bedHeight = fPosition.y;
 	vec3 lightColor;
 
-	float dif = waterHeight - fPosition.y;
+	float diff = waterHeight - fPosition.y;
 
 	vec3 n = vec3(1.0f);
-	//param--------------------
-	vec3 f  = vec3(2.0f, 204.0f, 147.0f) / 255.0f;
-	vec3 s  = vec3(2.0f, 204.0f, 147.0f) / 255.0f;
-	vec3 t  = vec3(2.0f, 204.0f, 147.0f) / 255.0f;
+	vec3 f  =  firstStageColor;
+	vec3 s  =  secondStageColor;
+	vec3 t  =  finalStageColor;
 	
-	if (dif <= 0) {
+	if (diff <= 0)
 		lightColor = n;
-	}
-	else if (dif <= .3) {
-		lightColor = mix(n,f,dif / 0.3);
-	}
-	else if (dif <= 0.5) {
-		lightColor = mix(f,s,(dif-0.3)/0.2);
-	}
-	else {
-		lightColor = mix(s,t,(dif-0.5)/2.5f);
-	}
-	//-------------
-	vec3 diffuseColor;
+	else if (diff <= firstStage)
+		lightColor = mix(n, f, (diff - 0.0f) / (firstStage - 0.0f));
+	else if (diff <= secondStage)
+		lightColor = mix(f, s, (diff - firstStage) / (secondStage - firstStage));
+	else
+		lightColor = mix(s, t, (diff - secondStage) / (3.0f - secondStage));
+
+	vec3 diffuseColor  = material.dif;
 	if (diffuseUsed)
 		diffuseColor = texture(diffuseTexture, fTexCoord).rgb;
-	else
-		diffuseColor = material.dif;
-	//diffuseColor = material.dif;
 
-	//param ---
-	float a = 0.0;
-	//-----------
-	float I = exp(-a * clamp(dif, 0, dif));
+
+	float a = attenuation;
+	float I = exp(-a * clamp(diff, 0, diff));
 
 	// ambient
 	vec3 ambient = light.amb * I * lightColor * material.amb;

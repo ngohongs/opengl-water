@@ -4,11 +4,9 @@
 #include <string>
 
 #include "GL/glew.h"
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 #include "Geometry.h"
 #include "Material.h"
 #include "Texture.h"
@@ -38,4 +36,3 @@ private:
 	glm::vec3 m_Position;
 	ModelColoring m_Coloring;
 };
-

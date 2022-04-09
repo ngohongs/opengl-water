@@ -5,25 +5,25 @@ CausticsRenderer::CausticsRenderer(const int& width, const int& height)
     m_Width = width;
     m_Height = height;
 
-    std::cout << m_Positions.AttachShader(VERTEX, "shaders/positions.vert") << std::endl;
-    std::cout << m_Positions.AttachShader(FRAGMENT, "shaders/positions.frag") << std::endl;
-    std::cout << "m_Positions " << m_Positions.LinkProgram() << std::endl;
+    m_Positions.AttachShader(VERTEX, "shaders/positions.vert");
+    m_Positions.AttachShader(FRAGMENT, "shaders/positions.frag");
+    m_Positions.LinkProgram();
 
-    std::cout << m_Normals.AttachShader(VERTEX, "shaders/normals.vert") << std::endl;
-    std::cout << m_Normals.AttachShader(FRAGMENT, "shaders/normals.frag") << std::endl;
-    std::cout << "m_Normals " << m_Normals.LinkProgram() << std::endl;
+    m_Normals.AttachShader(VERTEX, "shaders/normals.vert");
+    m_Normals.AttachShader(FRAGMENT, "shaders/normals.frag");
+    m_Normals.LinkProgram();
 
-    std::cout << m_Caustics.AttachShader(VERTEX, "shaders/caustics.vert") << std::endl;
-    std::cout << m_Caustics.AttachShader(FRAGMENT, "shaders/caustics.frag") << std::endl;
-    std::cout << "m_Caustics " << m_Caustics.LinkProgram() << std::endl;
+    m_Caustics.AttachShader(VERTEX, "shaders/caustics.vert");
+    m_Caustics.AttachShader(FRAGMENT, "shaders/caustics.frag");
+    m_Caustics.LinkProgram();
 
-    std::cout << m_Lowpass.AttachShader(VERTEX, "shaders/lowpass.vert") << std::endl;
-    std::cout << m_Lowpass.AttachShader(FRAGMENT, "shaders/lowpass.frag") << std::endl;
-    std::cout << "m_Lowpass " << m_Lowpass.LinkProgram() << std::endl;
+    m_Lowpass.AttachShader(VERTEX, "shaders/lowpass.vert");
+    m_Lowpass.AttachShader(FRAGMENT, "shaders/lowpass.frag");
+    m_Lowpass.LinkProgram();
 
     m_ReceiverPositions = { width, height, COLOR_RENDERBUFFER, LINEAR };
     m_RefractiveNormals = { width, height, COLOR, LINEAR };
-    m_RefractivePositions = { width, height, COLOR, LINEAR };
+    m_RefractivePositions = { width, height, COLOR, NEAREST };
     m_CausticMap = { width, height, COLOR, LINEAR };
     m_Filtered = { width, height, COLOR, LINEAR };
 

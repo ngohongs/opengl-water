@@ -9,9 +9,9 @@ Crosshair::Crosshair()
     glBufferData(GL_ARRAY_BUFFER, sizeof(crossVert), crossVert, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (GLvoid*)0);
-    std::cout << m_Shader.AttachShader(VERTEX, "shaders/crosshair.vert") << std::endl;
-    std::cout << m_Shader.AttachShader(FRAGMENT, "shaders/crosshair.frag") << std::endl;
-    std::cout << m_Shader.LinkProgram() << std::endl;
+    m_Shader.AttachShader(VERTEX, "shaders/crosshair.vert");
+    m_Shader.AttachShader(FRAGMENT, "shaders/crosshair.frag");
+    m_Shader.LinkProgram();
 }
 
 void Crosshair::Draw()

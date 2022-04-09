@@ -1,8 +1,9 @@
 #pragma once
-#include "Renderer.h"
 
+#include "Renderer.h"
 #include "Geometry.h"
 #include "Quad.h"
+
 class SimulationRenderer :
     public Renderer
 {

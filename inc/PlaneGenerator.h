@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
+
 #include "glm/glm.hpp"
 #include "Vertex.h"
+
 class PlaneGenerator
 {
 public:

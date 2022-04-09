@@ -1,19 +1,14 @@
 #pragma once
+
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
-
+#include "glm/glm.hpp"
+#include "glm/gtx/intersect.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
-
-#include "glm/glm.hpp"
-#include "glm/gtx/intersect.hpp"
-
-
 #include "State.h"
 #include "Shader.h"
-#include "Cube.h"
 #include "Quad.h"
 #include "Geometry.h"
 #include "PlaneGenerator.h"
@@ -22,7 +17,6 @@
 #include "Light.h"
 #include "RenderTarget.h"
 #include "Model.h"
-
 #include "SimulationRenderer.h"
 #include "CausticsRenderer.h"
 #include "SceneRenderer.h"

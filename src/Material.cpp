@@ -1,5 +1,4 @@
 #include "Material.h"
-#include "..\inc\Material.h"
 
 Material::Material(const glm::vec3& amb, const glm::vec3& dif, const glm::vec3& spe, const float& shi)
 {

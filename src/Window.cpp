@@ -9,8 +9,8 @@ Window::Window(const int& width, const int& height)
 
 int Window::Init()
 {
-    /* Create a windowed mode window and its OpenGL context */
-    m_Window = glfwCreateWindow(m_Width, m_Height, "OpenGL Water", NULL, NULL);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    m_Window = glfwCreateWindow(m_Width, m_Height, "OpenGL Water", glfwGetPrimaryMonitor(), NULL);
     if (!m_Window)
     {
         return 0;

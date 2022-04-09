@@ -1,9 +1,7 @@
 #pragma once
 
 #include "GL/glew.h"
-
 #include "State.h"
-
 #include "Texture.h"
 
 enum RTType {

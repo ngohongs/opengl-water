@@ -1,5 +1,4 @@
 #include "Skybox.h"
-#include "..\inc\Skybox.h"
 
 Skybox::Skybox(const char** faces)
 {

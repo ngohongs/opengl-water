@@ -1,6 +1,5 @@
 #include "Geometry.h"
 
-#include <iostream>
 Geometry::Geometry()
 {
 	m_VAO = 0;
@@ -115,13 +114,10 @@ void Geometry::Bind() const
 void Geometry::Draw() const
 {
 	glBindVertexArray(m_VAO);
-	if (m_IndCnt == 0) {
-		glDrawArrays(GL_POINTS, 0, m_VertCnt);
-
-	}
-	else {
-		glDrawElements(GL_TRIANGLES, m_IndCnt, GL_UNSIGNED_INT, 0);
-	}
+	if (m_IndCnt == 0)
+		glDrawArrays(GL_POINTS, 0, (GLsizei) m_VertCnt);
+	else 
+		glDrawElements(GL_TRIANGLES, (GLsizei) m_IndCnt, GL_UNSIGNED_INT, 0);
 }
 
 void Geometry::SetPosition(const glm::vec3& pos)
