@@ -412,3 +412,11 @@ FodyWeavers.xsd
 !resources/duck/*
 !resources/terrain/*
 !resources/cube/*
+
+# Dependencies
+!dep/assimp/bin/Debug/*
+!dep/assimp/bin/Release/*
+!dep/assimp/lib/Debug/*
+!dep/assimp/lib/Release/*
+!dep/glew-2.1.0/bin/Release/x64/*
+!dep/glew-2.1.0/lib/Release/x64/*
