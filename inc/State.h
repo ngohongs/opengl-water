@@ -39,7 +39,7 @@ public:
 	Texture m_ReflectionsPositions;
 	Texture m_Reflections;
 	Texture m_Refractions;
-	Texture m_RecieverPositions;
+	Texture m_ReceiverPositions;
 	Texture m_WaterNormals;
 	Texture m_Filtered;
 	Texture m_RefractivePositions;

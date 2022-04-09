@@ -7,7 +7,7 @@ public:
     CausticsRenderer(const int& width, const int& height);
     void Render() override;
     const Texture& Result() override;
-    const Texture& ResultRecieverPositions();
+    const Texture& ResultReceiverPositions();
 private:
     int m_Width;
     int m_Height;

@@ -21,7 +21,7 @@ private:
 
     Shader m_Positions;
 
-    Shader m_Reciever;
+    Shader m_Receiver;
     Shader m_Water;
     
     RenderTarget m_ReflectionsPositions;

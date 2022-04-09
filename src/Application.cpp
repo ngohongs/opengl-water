@@ -356,10 +356,10 @@ int Application::Run()
                 ImGui::NewLine();
 
 
-                ImGui::Text("Reciever positions:");
+                ImGui::Text("Receiver positions:");
                 ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
                 ImGui::Image(
-                    (void*)(intptr_t)state.m_RecieverPositions.GetTexture(),
+                    (void*)(intptr_t)state.m_ReceiverPositions.GetTexture(),
                     texSize
                 );
 

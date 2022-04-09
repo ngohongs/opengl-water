@@ -225,8 +225,8 @@
     <None Include="shaders\normals.vert" />
     <None Include="shaders\positions.frag" />
     <None Include="shaders\positions.vert" />
-    <None Include="shaders\reciever.frag" />
-    <None Include="shaders\reciever.vert" />
+    <None Include="shaders\receiver.frag" />
+    <None Include="shaders\receiver.vert" />
     <None Include="shaders\skybox.frag" />
     <None Include="shaders\skybox.vert" />
     <None Include="shaders\wave.frag" />

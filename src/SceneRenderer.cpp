@@ -19,9 +19,9 @@ SceneRenderer::SceneRenderer(const int& width, const int& height)
     std::cout << m_Positions.AttachShader(FRAGMENT, "shaders/positions.frag") << std::endl;
     std::cout << "m_Positions " << m_Positions.LinkProgram() << std::endl;
 
-    std::cout << m_Reciever.AttachShader(VERTEX, "shaders/reciever.vert") << std::endl;
-    std::cout << m_Reciever.AttachShader(FRAGMENT, "shaders/reciever.frag") << std::endl;
-    std::cout << "m_Reciever " << m_Reciever.LinkProgram() << std::endl;
+    std::cout << m_Receiver.AttachShader(VERTEX, "shaders/receiver.vert") << std::endl;
+    std::cout << m_Receiver.AttachShader(FRAGMENT, "shaders/receiver.frag") << std::endl;
+    std::cout << "m_Receiver " << m_Receiver.LinkProgram() << std::endl;
 
     const char* faces[] = {
             "resources/skybox/right.jpg",
@@ -72,21 +72,21 @@ void SceneRenderer::Render()
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-            m_Reciever.Use();
-            m_Reciever.SetBool("duck", false);
-            m_Reciever.SetFloat("waterHeight", 0.0f);
-            m_Reciever.SetVec3("cameraPosition", state.m_Camera.GetEye());
-            state.m_Light.Bind(m_Reciever);
-            m_Reciever.SetMat4("projection", state.m_ProjectionMatrix);
-            m_Reciever.SetMat4("view", state.m_Camera.GetViewMatrix());
-            m_Reciever.SetMat4("orthogonal", state.m_OrthogonalMatrix);
-            m_Reciever.SetMat4("lightView", state.m_Light.GetViewMatrix());
+            m_Receiver.Use();
+            m_Receiver.SetBool("duck", false);
+            m_Receiver.SetFloat("waterHeight", 0.0f);
+            m_Receiver.SetVec3("cameraPosition", state.m_Camera.GetEye());
+            state.m_Light.Bind(m_Receiver);
+            m_Receiver.SetMat4("projection", state.m_ProjectionMatrix);
+            m_Receiver.SetMat4("view", state.m_Camera.GetViewMatrix());
+            m_Receiver.SetMat4("orthogonal", state.m_OrthogonalMatrix);
+            m_Receiver.SetMat4("lightView", state.m_Light.GetViewMatrix());
             state.m_CausticMap.Bind(GL_TEXTURE0);
-            state.m_RecieverPositions.Bind(GL_TEXTURE1);
+            state.m_ReceiverPositions.Bind(GL_TEXTURE1);
 
-            state.m_Models["terrain"].Draw(m_Reciever);
+            state.m_Models["terrain"].Draw(m_Receiver);
 
-            state.m_Models["cube"].Draw(m_Reciever);
+            state.m_Models["cube"].Draw(m_Receiver);
 
             m_Sky.Draw(state.m_ProjectionMatrix, state.m_Camera.GetViewMatrix());
 
@@ -124,28 +124,28 @@ void SceneRenderer::Render()
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-            m_Reciever.Use();
-            m_Reciever.SetBool("duck", false);
-            m_Reciever.SetFloat("waterHeight", 0.0f);
-            m_Reciever.SetVec3("cameraPosition", state.m_Camera.GetEye());
-            state.m_Light.Bind(m_Reciever);
-            m_Reciever.SetMat4("projection", state.m_ProjectionMatrix);
-            m_Reciever.SetMat4("view", state.m_Camera.GetViewMatrix());
-            m_Reciever.SetMat4("orthogonal", state.m_OrthogonalMatrix);
-            m_Reciever.SetMat4("lightView", state.m_Light.GetViewMatrix());
+            m_Receiver.Use();
+            m_Receiver.SetBool("duck", false);
+            m_Receiver.SetFloat("waterHeight", 0.0f);
+            m_Receiver.SetVec3("cameraPosition", state.m_Camera.GetEye());
+            state.m_Light.Bind(m_Receiver);
+            m_Receiver.SetMat4("projection", state.m_ProjectionMatrix);
+            m_Receiver.SetMat4("view", state.m_Camera.GetViewMatrix());
+            m_Receiver.SetMat4("orthogonal", state.m_OrthogonalMatrix);
+            m_Receiver.SetMat4("lightView", state.m_Light.GetViewMatrix());
             state.m_CausticMap.Bind(GL_TEXTURE0);
-            state.m_RecieverPositions.Bind(GL_TEXTURE1);
+            state.m_ReceiverPositions.Bind(GL_TEXTURE1);
 
-            state.m_Models["terrain"].Draw(m_Reciever);
+            state.m_Models["terrain"].Draw(m_Receiver);
 
-            state.m_Models["cube"].Draw(m_Reciever);
+            state.m_Models["cube"].Draw(m_Receiver);
 
-            m_Reciever.SetBool("duck", true);
-            m_Reciever.SetVec3("duckPosition", state.m_Models["duck"].GetPosition());
-            m_Reciever.SetFloat("texelSize", 1.0f / state.m_Res);
+            m_Receiver.SetBool("duck", true);
+            m_Receiver.SetVec3("duckPosition", state.m_Models["duck"].GetPosition());
+            m_Receiver.SetFloat("texelSize", 1.0f / state.m_Res);
             //heightField[1 - i].GetColorTexture().Bind(GL_TEXTURE2);
             state.m_HeightField.Bind(GL_TEXTURE2);
-            state.m_Models["duck"].Draw(m_Reciever);
+            state.m_Models["duck"].Draw(m_Receiver);
 
 
             m_Sky.Draw(state.m_ProjectionMatrix, state.m_Camera.GetViewMatrix());
@@ -158,30 +158,30 @@ void SceneRenderer::Render()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        m_Reciever.Use();
-        m_Reciever.SetBool("duck", false);
-        m_Reciever.SetBool("diffuseUsed", false);
-        m_Reciever.SetFloat("waterHeight", 0.0f);
-        m_Reciever.SetVec3("cameraPosition", state.m_Camera.GetEye());
-        state.m_Light.Bind(m_Reciever);
-        m_Reciever.SetMat4("projection", state.m_ProjectionMatrix);
-        m_Reciever.SetMat4("view", state.m_Camera.GetViewMatrix());
-        m_Reciever.SetMat4("orthogonal", state.m_OrthogonalMatrix);
-        m_Reciever.SetMat4("lightView", state.m_Light.GetViewMatrix());
+        m_Receiver.Use();
+        m_Receiver.SetBool("duck", false);
+        m_Receiver.SetBool("diffuseUsed", false);
+        m_Receiver.SetFloat("waterHeight", 0.0f);
+        m_Receiver.SetVec3("cameraPosition", state.m_Camera.GetEye());
+        state.m_Light.Bind(m_Receiver);
+        m_Receiver.SetMat4("projection", state.m_ProjectionMatrix);
+        m_Receiver.SetMat4("view", state.m_Camera.GetViewMatrix());
+        m_Receiver.SetMat4("orthogonal", state.m_OrthogonalMatrix);
+        m_Receiver.SetMat4("lightView", state.m_Light.GetViewMatrix());
         state.m_CausticMap.Bind(GL_TEXTURE0);
-        state.m_RecieverPositions.Bind(GL_TEXTURE1);
+        state.m_ReceiverPositions.Bind(GL_TEXTURE1);
         state.m_HeightField.Bind(GL_TEXTURE2);
-        m_Reciever.SetVec3("duckPosition", state.m_Models["duck"].GetPosition());
-        m_Reciever.SetFloat("texelSize", 1.0f / state.m_Res);
+        m_Receiver.SetVec3("duckPosition", state.m_Models["duck"].GetPosition());
+        m_Receiver.SetFloat("texelSize", 1.0f / state.m_Res);
 
 
 
-        state.m_Models["terrain"].Draw(m_Reciever);
+        state.m_Models["terrain"].Draw(m_Receiver);
 
-        state.m_Models["cube"].Draw(m_Reciever);
+        state.m_Models["cube"].Draw(m_Receiver);
 
-        m_Reciever.SetBool("duck", true);
-        state.m_Models["duck"].Draw(m_Reciever);
+        m_Receiver.SetBool("duck", true);
+        state.m_Models["duck"].Draw(m_Receiver);
 
         m_Sky.Draw(state.m_ProjectionMatrix, state.m_Camera.GetViewMatrix());
 

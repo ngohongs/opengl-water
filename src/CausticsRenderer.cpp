@@ -28,7 +28,7 @@ CausticsRenderer::CausticsRenderer(const int& width, const int& height)
     m_Filtered = { width, height, COLOR, LINEAR };
 
     state.m_CausticMap = m_CausticMap.GetColorTexture();
-    state.m_RecieverPositions = m_ReceiverPositions.GetColorTexture();
+    state.m_ReceiverPositions = m_ReceiverPositions.GetColorTexture();
     state.m_Filtered = m_Filtered.GetColorTexture();
     state.m_RefractivePositions = m_ReceiverPositions.GetColorTexture();
     state.m_RefractiveNormals = m_RefractiveNormals.GetColorTexture();
@@ -151,7 +151,7 @@ const Texture& CausticsRenderer::Result()
     return m_Filtered.GetColorTexture();
 }
 
-const Texture& CausticsRenderer::ResultRecieverPositions()
+const Texture& CausticsRenderer::ResultReceiverPositions()
 {
    return m_ReceiverPositions.GetColorTexture();
 }
