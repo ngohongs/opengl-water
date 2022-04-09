@@ -66,7 +66,7 @@ void State::GenerateGeometriesModels()
 	m_Models["terrain"].SetPosition(glm::vec3(0.0f, state.m_BedHeight, 0.0f));
 	m_Models["cube"].SetScale(glm::vec3(0.30f));
 	m_Models["cube"].SetPosition(glm::vec3(0.0f, state.m_CubeHeight, 0.0f));
-	state.m_Models["cube"].SetMaterial(Material(state.m_CubeColor, state.m_CubeColor, state.m_CubeColor, 30.0f));
+	m_Models["cube"].SetMaterial(Material(state.m_CubeColor, state.m_CubeColor, state.m_CubeColor, 30.0f));
 }
 
 void State::Reset()
@@ -95,4 +95,8 @@ void State::Reset()
 	m_CausticsPower = 95.f;
 
 	m_FirstGuess = 0.1f;
+
+	m_Models["terrain"].SetPosition(glm::vec3(0.0f, state.m_BedHeight, 0.0f));
+	m_Models["cube"].SetPosition(glm::vec3(0.0f, state.m_CubeHeight, 0.0f));
+	m_Models["cube"].SetMaterial(Material(state.m_CubeColor, state.m_CubeColor, state.m_CubeColor, 30.0f));
 }
