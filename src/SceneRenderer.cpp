@@ -35,7 +35,7 @@ SceneRenderer::SceneRenderer(const int& width, const int& height)
     m_Sky = Skybox(faces);
 
     state.m_ReflectionsPositions = m_ReflectionsPositions.GetColorTexture();
-    state.m_ReflectionsPositions = m_RefractionsPositions.GetColorTexture();
+    state.m_RefractionsPositions = m_RefractionsPositions.GetColorTexture();
     state.m_Reflections = m_Reflections.GetColorTexture();
     state.m_Refractions = m_Refractions.GetColorTexture();
 }
@@ -43,25 +43,25 @@ SceneRenderer::SceneRenderer(const int& width, const int& height)
 void SceneRenderer::Render()
 {
 
-//refractions / reflections
+    //refractions / reflections
     {
         {
             m_RefractionsPositions.Bind();
 
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            m_Positions.Use();
-            m_Positions.SetBool("duck", false);
-            m_Positions.SetBool("under", true);
-            m_Positions.SetMat4("projection", state.m_ProjectionMatrix);
-            m_Positions.SetMat4("view", state.m_Camera.GetViewMatrix());
-            m_Positions.SetBool("wave", false);
+                m_Positions.Use();
+            
+                m_Positions.SetMat4("projection", state.m_ProjectionMatrix);
+                m_Positions.SetMat4("view", state.m_Camera.GetViewMatrix());
+                m_Positions.SetBool("duck", false);
+                m_Positions.SetBool("wave", false);
+             
+                state.m_Models["terrain"].DrawNoColor(m_Positions);
 
-            state.m_Models["terrain"].DrawNoColor(m_Positions);
-
-            state.m_Models["cube"].DrawNoColor(m_Positions);
+                state.m_Models["cube"].DrawNoColor(m_Positions);
 
             m_RefractionsPositions.Unbind();
         }
@@ -74,7 +74,6 @@ void SceneRenderer::Render()
 
             m_Reciever.Use();
             m_Reciever.SetBool("duck", false);
-            m_Reciever.SetBool("under", true);
             m_Reciever.SetFloat("waterHeight", 0.0f);
             m_Reciever.SetVec3("cameraPosition", state.m_Camera.GetEye());
             state.m_Light.Bind(m_Reciever);
@@ -95,25 +94,27 @@ void SceneRenderer::Render()
         }
         {
             m_ReflectionsPositions.Bind();
-            glEnable(GL_DEPTH_TEST);
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            m_Positions.Use();
-            m_Positions.SetBool("duck", false);
-            m_Positions.SetBool("under", false);
-            m_Positions.SetMat4("projection", state.m_ProjectionMatrix);
-            m_Positions.SetMat4("view", state.m_Camera.GetViewMatrix());
-            m_Positions.SetBool("wave", false);
 
-            state.m_Models["terrain"].DrawNoColor(m_Positions);
+                glEnable(GL_DEPTH_TEST);
+                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            state.m_Models["cube"].DrawNoColor(m_Positions);
+                m_Positions.Use();
 
-            m_Positions.SetBool("duck", true);
-            m_Positions.SetVec3("duckPosition", state.m_Models["duck"].GetPosition());
-            m_Positions.SetFloat("texelSize", 1.0f / state.m_Res);
-            state.m_HeightField.Bind(GL_TEXTURE0);
-            state.m_Models["duck"].DrawNoColor(m_Positions);
+                m_Positions.SetMat4("projection", state.m_ProjectionMatrix);
+                m_Positions.SetMat4("view", state.m_Camera.GetViewMatrix());
+                m_Positions.SetFloat("texelSize", 1.0f / state.m_Res);
+                m_Positions.SetBool("duck", false);
+                m_Positions.SetVec3("duckPosition", state.m_Models["duck"].GetPosition());
+                m_Positions.SetBool("wave", false);
+                state.m_HeightField.Bind(GL_TEXTURE0);
+
+                state.m_Models["terrain"].DrawNoColor(m_Positions);
+
+                state.m_Models["cube"].DrawNoColor(m_Positions);
+
+                m_Positions.SetBool("duck", true);
+                state.m_Models["duck"].DrawNoColor(m_Positions);
 
             m_ReflectionsPositions.Unbind();
         }
@@ -125,7 +126,6 @@ void SceneRenderer::Render()
 
             m_Reciever.Use();
             m_Reciever.SetBool("duck", false);
-            m_Reciever.SetBool("under", false);
             m_Reciever.SetFloat("waterHeight", 0.0f);
             m_Reciever.SetVec3("cameraPosition", state.m_Camera.GetEye());
             state.m_Light.Bind(m_Reciever);
@@ -186,18 +186,24 @@ void SceneRenderer::Render()
         m_Sky.Draw(state.m_ProjectionMatrix, state.m_Camera.GetViewMatrix());
 
         m_Water.Use();
+
         m_Water.SetMat4("projection", state.m_ProjectionMatrix);
         m_Water.SetMat4("view", state.m_Camera.GetViewMatrix());
         m_Water.SetMat4("model", state.m_Geometry["plane"].GetModelMatrix());
-        m_Water.SetVec3("cameraPosition", state.m_Camera.GetEye());
+
         m_Water.SetFloat("texelSize", 1.0f / state.m_Res);
+        m_Water.SetFloat("firstGuess", state.m_FirstGuess);
+
+        m_Water.SetVec3("cameraPosition", state.m_Camera.GetEye());
+
+       
         state.m_HeightField.Bind(GL_TEXTURE0);
         m_Sky.Bind(GL_TEXTURE1);
         m_RefractionsPositions.GetColorTexture().Bind(GL_TEXTURE2);
         m_Refractions.GetColorTexture().Bind(GL_TEXTURE3);
         m_ReflectionsPositions.GetColorTexture().Bind(GL_TEXTURE4);
         m_Reflections.GetColorTexture().Bind(GL_TEXTURE5);
-        m_Reflections.GetDepthTexture().Bind(GL_TEXTURE6);
+
         state.m_Geometry["plane"].Draw();
 }
 

@@ -23,11 +23,9 @@ layout(binding=2) uniform sampler2D refractivePositions;
 
 const float ETA = 1.00 / 1.33;
 
-flat out int valid;
-
-out float fi;
-out float d;
-
+flat out int fValid;
+out float fPhi;
+out float fDistance;
 
 vec4 EstimateIntersection(vec3 v, vec3 r) {
 	vec3 p1 = v + 1.0 * r;
@@ -50,12 +48,12 @@ void main()
 
 	vec4 p = EstimateIntersection(refractivePosition.xyz, refractedLight);
 
-	if (refractivePosition.a <= 0.001f || refractiveNormal.a <= 0.001f || p.a <= 0.001f  ||  dot(p.xyz - refractivePosition.xyz, refractedLight) < 0.001f )
-		valid = 0;
+	if (refractivePosition.a <= 0.001f || refractiveNormal.a <= 0.001f || p.a <= 0.001f  || p.y > refractivePosition.y || dot(p.xyz - refractivePosition.xyz, refractedLight) < 0.01f )
+		fValid = 0;
 	else
-		valid = 1;
+		fValid = 1;
 
-	d = distance(p, refractivePosition);
-	fi = dot(-incidentLight, normalize(refractiveNormal.xyz));
+	fDistance = distance(p, refractivePosition);
+	fPhi = dot(-incidentLight, normalize(refractiveNormal.xyz));
     gl_Position = projection * view * model * vec4(p.xyz, 1.0);
 }   

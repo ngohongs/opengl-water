@@ -1,37 +1,31 @@
 #version 420 core
-out vec4 FragColor;  
-
 in vec3 fPosition;
 in vec2 fTexCoord;
 in vec3 toCameraDir;
-in vec4 fWorldCoord;
 
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 
 uniform float texelSize;
-
-
-layout(binding=0) uniform sampler2D tex;
-layout(binding=1) uniform samplerCube environment;
-
-layout(binding=2) uniform sampler2D positionsRefracted;
-layout(binding=4) uniform sampler2D positionsReflected;
-
-layout(binding=3) uniform sampler2D colorRefracted;
-layout(binding=5) uniform sampler2D colorReflected;
-
-layout(binding=6) uniform sampler2D screenDepth;
-
+uniform float firstGuess;
 
 uniform vec3 cameraPosition;
+uniform vec3 waterColor;
+
+layout(binding=0) uniform sampler2D heightField;
+layout(binding=1) uniform samplerCube environment;
+layout(binding=2) uniform sampler2D positionsRefracted;
+layout(binding=3) uniform sampler2D colorRefracted;
+layout(binding=4) uniform sampler2D positionsReflected;
+layout(binding=5) uniform sampler2D colorReflected;
+
+out vec4 FragColor; 
 
 const float eta = 1.00 / 1.52;
 
-
 vec2 EstimateIntersection(vec3 v, vec3 r, vec3 normal, sampler2D positions) {
-	vec3 p1 = v + 0.1 * (1 - dot(normal, normalize(toCameraDir))) * r;
+	vec3 p1 = v + firstGuess * (1 - dot(normal, normalize(toCameraDir))) * r; 
 	vec4 texPt = projection * view * vec4(p1, 1.0);
 	vec2 texC = 0.5 * (texPt.xy/texPt.w) + 0.5;
 	vec4 recPos = texture(positions, texC);
@@ -48,8 +42,6 @@ vec2 EstimateIntersection(vec3 v, vec3 r, vec3 normal, sampler2D positions) {
 }
 
 
-
-
 void main()
 {    
     vec2 px = vec2(texelSize, 0);
@@ -58,11 +50,10 @@ void main()
     vec2 ny = vec2(0, -texelSize);
 
 
-    float r = texture(tex, fTexCoord + px).r;
-    float l = texture(tex, fTexCoord + nx).r;
-    float t = texture(tex, fTexCoord + py).r;
-    float b = texture(tex, fTexCoord + ny).r;
-    float m = texture(tex, fTexCoord).r;
+    float r = texture(heightField, fTexCoord + px).r;
+    float l = texture(heightField, fTexCoord + nx).r;
+    float t = texture(heightField, fTexCoord + py).r;
+    float b = texture(heightField, fTexCoord + ny).r;
 
     vec3 hor = vec3(2 * texelSize ,r - l,0);
     vec3 ver = vec3(0,t - b,2 * texelSize);
@@ -78,15 +69,15 @@ void main()
     vec3 refractDir = normalize(refract(viewDir, normal, eta));
 
     
-	vec2 refractedUV = EstimateIntersection(fWorldCoord.xyz, refractDir, normal, positionsRefracted);
+	vec2 refractedUV = EstimateIntersection(fPosition, refractDir, normal, positionsRefracted);
     vec4 refractedColor = texture(colorRefracted, refractedUV);
-    if (refractedUV.x < 0.0f)
-        refractedColor = mix(texture(environment, refractDir), texture(environment, viewDir), 0.3);
+    if (refractedUV.x <= 0.0f)
+       refractedColor = texture(environment, refractDir);
 
 
-	vec2 reflectedUV = EstimateIntersection(fWorldCoord.xyz, reflectDir, normal, positionsReflected);
+	vec2 reflectedUV = EstimateIntersection(fPosition, reflectDir, normal, positionsReflected);
     vec4 reflectedColor = texture(colorReflected, reflectedUV);
-    if (reflectedUV.x < 0.0f)
+    if (reflectedUV.x <= 0.0f)
         reflectedColor = texture(environment, reflectDir);
 
     float ci = dot(normal, viewDir);
@@ -100,7 +91,6 @@ void main()
 
     float rc = 1 - (rs+rp) / 2;
 
-    //float fresnel = dot(normalize(toCameraDir), normal);
     vec3 color = mix(reflectedColor, refractedColor, rc).rgb;
 	vec3 waterColor = vec3(2.0f, 204.0f, 147.0f) / 255.0f;
     FragColor = vec4(vec3(mix(color, waterColor, 0.025f)), 1.0f);

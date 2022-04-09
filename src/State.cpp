@@ -21,9 +21,22 @@ State::State(const int& width, const int& height)
 		i = false;
 	m_Res = 64;
 	m_Light = Light(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
-		{ 0.1f, 0.1f, 0.1f }, { 0.8f, 0.8f, 0.8f }, { 1.0f, 1.0f, 1.0f });
+		{ 0.1f, 0.1f, 0.1f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f });
 	m_ProjectionMatrix = glm::perspective(glm::radians(m_FOV), (float)width / (float)height, 0.1f, 1000.0f);
 	m_OrthogonalMatrix = glm::ortho(-3.0f, 3.0f, -3.0f, 3.0f, 0.1f, 100.0f);
+
+
+	m_Radius = 1.5f;
+	m_Amplitude = 0.05f;
+
+	m_WaveSpeed = 0.2f;
+	m_WaveDamping = 0.0f;
+	m_WaveSlope = 0.3f;
+
+	m_CausticsAbsorbtion = 1.0f;
+	m_CausticsPower = 90.f;
+
+	m_FirstGuess = 0.1f;
 }
 
 int State::Init()
@@ -58,13 +71,9 @@ void State::GenerateGeometriesModels()
 	m_Geometry.emplace("debugdlQuad", Geometry(ddlquadVertices, ddlquadNVertices, ddlquadTriangles, ddlquadNTriangles));
 	m_Geometry.emplace("debugddQuad", Geometry(ddquadVertices, ddquadNVertices, ddquadTriangles, ddquadNTriangles));
 
-
-	glm::vec3 pinkColor({ 1.0f, 0.0f, 1.0f });
-	Material pinkMaterial{ 0.4f * pinkColor, 0.7f * pinkColor, 0.31f * pinkColor, 10.0f };
-
 	m_Models.emplace("duck", Model("resources/duck/duck.obj"));
 	m_Models.emplace("terrain", Model("resources/terrain/terrain.obj"));
-	m_Models.emplace("cube", Model(Geometry(cubeVertices, cubeNVertices, cubeTriangles, cubeNTriangles), pinkMaterial));
+	m_Models.emplace("cube", Model("resources/cube/cube.obj"));
 
 	m_Models["duck"].SetScale(glm::vec3(0.2f));
 	m_Models["duck"].SetPosition(glm::vec3(0.0f, -0.01f, -.5f));

@@ -26,6 +26,8 @@ public:
 	void Bind(const int & unit) const;
 	bool Initialized() const;
 	GLuint GetTexture() const;
+	int GetWidth() const;
+	int GetHeight() const;
 private:
 	GLuint m_Texture;
 	int m_Width;

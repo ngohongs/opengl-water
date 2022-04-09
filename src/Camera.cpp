@@ -23,6 +23,11 @@ glm::mat4 Camera::GetViewMatrix() const
 	return glm::lookAt(m_Eye, m_Eye + m_Direction, m_Up);
 }
 
+glm::mat4 Camera::GetFlippedViewMatrix() const
+{
+	return glm::lookAt(m_Eye, m_Eye + m_Direction, -m_Up);
+}
+
 void Camera::Slide(const float& c, const DirectionEnum& dir)
 {
 	glm::vec3 right = glm::normalize(glm::cross(m_Direction, m_Up));

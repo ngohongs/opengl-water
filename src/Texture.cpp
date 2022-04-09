@@ -75,3 +75,13 @@ GLuint Texture::GetTexture() const
 {
     return m_Texture;
 }
+
+int Texture::GetWidth() const
+{
+    return m_Width;
+}
+
+int Texture::GetHeight() const
+{
+    return m_Height;
+}

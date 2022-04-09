@@ -1,33 +1,22 @@
 #version 420 core
-layout (location = 0) in vec3 aPos;   // the position variable has attribute position 0
+layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
-//layout (location = 2) in vec2 aTexCoord; // the color variable has attribute position 1
+
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
-
 uniform mat4 orthogonal;
 uniform mat4 lightView;
-
-
-out vec2 texCoord;
-
-out vec3 fPosition;
-out vec3 fNormal;
-out float bedHeight;
-
-uniform bool under;
-
-out vec2 uv;
-
-
-layout(binding=2) uniform sampler2D heightfield;
 uniform bool duck;
 uniform vec3 duckPosition;
 uniform float texelSize;
+layout(binding=2) uniform sampler2D heightfield;
 
-
+out vec3 fPosition;
+out vec3 fNormal;
+out vec2 fTexCoord;
+out vec2 fCausticsTexCoord;
 
  mat4 rotate(mat4 m, float angle, vec3 v) {
 	float a = angle;
@@ -58,8 +47,8 @@ uniform float texelSize;
 	return Result;
 }
 
-vec2 calculateTexCoord() {
-    vec4 lightClip = orthogonal * lightView * model * vec4(aPos, 1.0);
+vec2 calculateCausticsTexCoord() {
+    vec4 lightClip = orthogonal * lightView * model * vec4(aPosition, 1.0);
     vec2 texC = 0.5 * (lightClip.xy/lightClip.w) + 0.5;
     return texC;
 }
@@ -87,14 +76,14 @@ vec3 calcDuckYAxis() {
 }
 
 mat4 duckRotateMatrix() {
-    vec3 target_dir = normalize(calcDuckYAxis());
-    vec3 y_axis = vec3(0.0f, 1.0f, 0.0f);
-    float rot_angle = acos( dot(target_dir,y_axis) );
+    vec3 targetDir = normalize(calcDuckYAxis());
+    vec3 yAxis = vec3(0.0f, 1.0f, 0.0f);
+    float rotAngle = acos( dot(targetDir,yAxis) );
     mat4 rotateMatrix = mat4(1.0f);
-    if( abs(rot_angle) > 0.001 )
+    if( abs(rotAngle) > 0.001 )
     {
-        vec3 rot_axis = normalize( cross(target_dir,y_axis) );
-        rotateMatrix = rotate(rotateMatrix, rot_angle, rot_axis);
+        vec3 rotAxis = normalize( cross(targetDir,yAxis) );
+        rotateMatrix = rotate(rotateMatrix, rotAngle, rotAxis);
     }
     return rotateMatrix;
 }
@@ -106,23 +95,18 @@ float duckHeight() {
 
 void main()
 {
-    texCoord = calculateTexCoord();
-
-    vec4 pos = vec4(aPos, 1.0f);
+    vec4 position = vec4(aPosition, 1.0f);
     if (duck)
-        pos = duckRotateMatrix() * (pos + vec4(0.0f, 5.0f * duckHeight(), 0.0f, 0.0f));
+        position = duckRotateMatrix() * (position + vec4(0.0f, 5.0f * duckHeight(), 0.0f, 0.0f));
 
-    vec4 worldCoord = model * pos;
+    vec4 worldCoord = model * position;
     vec4 viewCoord = view * worldCoord;
     vec4 projCoord = projection * viewCoord;
 
-    fNormal = mat3(transpose(inverse(model)))  * aNormal;
-    uv = aTexCoord; 
     fPosition = worldCoord.xyz;
-    if (under)
-        gl_ClipDistance[0] = dot(worldCoord, vec4(0,-1,0,0.009));
-    else
-        gl_ClipDistance[0] = -dot(worldCoord, vec4(0,-1,0,0.009));
+    fNormal = normalize(mat3(transpose(inverse(model))) * aNormal);
+    fTexCoord = aTexCoord; 
+    fCausticsTexCoord = calculateCausticsTexCoord();
 
     gl_Position = projCoord;
 }   

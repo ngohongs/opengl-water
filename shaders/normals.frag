@@ -1,17 +1,15 @@
-#version 330 core
-out vec4 FragColor;
-
+#version 420 core
 in vec2 fTexCoord;
 in vec3 fNormal;
 
 uniform mat4 projection;
 uniform mat4 view;     
 uniform mat4 model;  
-
-uniform sampler2D tex;
 uniform float texelSize;
-
 uniform bool wave;
+layout(binding=0) uniform sampler2D heightField;
+
+out vec4 FragColor;
 
 void main()
 {   
@@ -21,11 +19,11 @@ void main()
     vec2 ny = vec2(0, -texelSize);
 
 
-    float r = texture(tex, fTexCoord + px).r;
-    float l = texture(tex, fTexCoord + nx).r;
-    float t = texture(tex, fTexCoord + py).r;
-    float b = texture(tex, fTexCoord + ny).r;
-    float m = texture(tex, fTexCoord).r;
+    float r = texture(heightField, fTexCoord + px).r;
+    float l = texture(heightField, fTexCoord + nx).r;
+    float t = texture(heightField, fTexCoord + py).r;
+    float b = texture(heightField, fTexCoord + ny).r;
+    float m = texture(heightField, fTexCoord).r;
 
     vec3 normal;
 

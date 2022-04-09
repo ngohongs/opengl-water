@@ -25,10 +25,10 @@ class Model
 public:
 	Model() = default;
 	Model(const std::string& path);
-	Model(const Geometry& geometry, const Material& material);
 	void Draw(const Shader& shader);
 	void DrawNoColor(const Shader& shader);
 	void SetScale(const glm::vec3& scale);
+	void SetMaterial(const Material& material);
 	void SetPosition(const glm::vec3& pos);
 	glm::vec3 GetPosition() const;
 private:

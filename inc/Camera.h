@@ -16,6 +16,7 @@ public:
 	Camera();
 	Camera(const glm::vec3& eye, const glm::vec3& dir, const glm::vec3& up, const float& pitch, const float& yaw);
 	glm::mat4 GetViewMatrix() const;
+	glm::mat4 GetFlippedViewMatrix() const;
 	void Slide(const float& c, const DirectionEnum& dir);
 	void Tilt(const float& a);
 	void Pan(const float& a);

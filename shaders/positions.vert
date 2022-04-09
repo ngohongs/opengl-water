@@ -2,27 +2,20 @@
 layout (location = 0) in vec3 aPosition;   // the position variable has attribute position 0
 layout (location = 2) in vec2 aTexCoord;   // the position variable has attribute position 0
 
-
-
-
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
-
-uniform bool wave;
-
-layout(binding=0) uniform sampler2D heightField;
-
-uniform bool under;
-
 uniform float texelSize;
-
 uniform bool duck;
 uniform vec3 duckPosition;
-
+uniform bool wave;
+layout(binding=0) uniform sampler2D heightField;
 
 out vec4 fPosition;
 
+const float duckBounce = 5.0f;
+
+// Implementation of glm::rotate taken from 
  mat4 rotate(mat4 m, float angle, vec3 v) {
 	float a = angle;
 	float c = cos(a);
@@ -95,33 +88,21 @@ float duckHeight() {
 void main()
 {
     float height = texture(heightField, aTexCoord).r;
-    vec3 offset = vec3(0.0, height, 0.0);
+    vec4 offset = vec4(0.0f, height, 0.0f, 0.0f);
 
-
-    vec4 position; 
+    vec4 position = vec4(aPosition, 1.0); 
 
     if (wave)
-    {
-        position = vec4(aPosition + offset, 1.0);
-    }
-    else
-    {
-        position = vec4(aPosition, 1.0);
-        if (duck)
-            position = duckRotateMatrix() * (position + vec4(0.0f, 5.0f * duckHeight(), 0.0f, 0.0f));
-    }
-
-    vec4 worldc = model * position;
-    vec4 viewc = view * worldc;
-    vec4 projc = projection * viewc;
-   
-    fPosition = worldc;
+        position += offset;
     
+    if (duck)
+        position = duckRotateMatrix() * (position + duckHeight() * offset);
 
-    if (under)
-        gl_ClipDistance[0] = dot(worldc, vec4(0,-1,0,0.005));
-    else
-        gl_ClipDistance[0] = -dot(worldc, vec4(0,-1,0,0.005));
-
-    gl_Position = projc;
+    vec4 worldCoord = model * position;
+    vec4 viewCoord = view * worldCoord;
+    vec4 projCoord = projection * viewCoord;
+   
+    fPosition = worldCoord;
+    
+    gl_Position = projCoord;
 }   

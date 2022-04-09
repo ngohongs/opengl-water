@@ -16,7 +16,6 @@ const unsigned quadTriangles[] = {
   0, 2, 3,
 }; // end planeTriangles
 
-
 const int dquadNAttribsPerVertex = 8;
 const int dquadNVertices = 4;
 const int dquadNTriangles = 2;

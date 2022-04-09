@@ -69,8 +69,9 @@ Model::Model(const std::string& path)
 
 
 
-    Texture texture;
+    m_Coloring = MATERIAL;
 
+    Texture texture;
     // get diffuse texture
     if (material->GetTextureCount(aiTextureType_DIFFUSE)) {
         aiString str;
@@ -78,24 +79,19 @@ Model::Model(const std::string& path)
         std::string fullPath = directory + "/" + str.C_Str();
         Texture texture(fullPath);
         m_Texture = texture;
+        m_Coloring = MATERIAL_TEXTURE;
     }
 
     m_Material = mat;
     m_Geometry = Geometry(vertices, indices);
     m_Position = glm::vec3(0.0f);
-    m_Coloring = MATERIAL_TEXTURE;
-}
-
-Model::Model(const Geometry& geometry, const Material& material)
-{
-    m_Geometry = geometry;
-    m_Material = material;
-    m_Coloring = MATERIAL;
+    
 }
 
 void Model::Draw(const Shader& shader)
 {
     if (m_Coloring == MATERIAL || MATERIAL_TEXTURE) {
+        shader.SetBool("diffuseUsed", false);
         shader.SetVec3("material.amb", m_Material.m_Ambient);
         shader.SetVec3("material.dif", m_Material.m_Diffuse);
         shader.SetVec3("material.spe", m_Material.m_Specular);
@@ -109,11 +105,6 @@ void Model::Draw(const Shader& shader)
     shader.SetMat4("model", m_Geometry.GetModelMatrix());
 
     m_Geometry.Draw();
-
-    if (m_Coloring == MATERIAL_TEXTURE) {
-        shader.SetBool("diffuseUsed", false);
-        glActiveTexture(GL_TEXTURE0);
-    }
 }
 
 void Model::DrawNoColor(const Shader& shader)
@@ -125,6 +116,11 @@ void Model::DrawNoColor(const Shader& shader)
 void Model::SetScale(const glm::vec3& scale)
 {
     m_Geometry.SetScale(scale);
+}
+
+void Model::SetMaterial(const Material& material)
+{
+    m_Material = material;
 }
 
 void Model::SetPosition(const glm::vec3& pos)

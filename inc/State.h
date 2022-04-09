@@ -50,6 +50,26 @@ public:
 	Camera m_Camera;
 	Window m_Window;
 	bool m_DropTest;
+
+	float m_Radius;
+	float m_Amplitude;
+
+	float m_WaveSpeed;
+	float m_WaveDamping;
+	float m_WaveSlope;
+
+	float m_CausticsAbsorbtion;
+	float m_CausticsPower;
+
+	float m_FirstGuess;
+
+	float m_FirstStage;
+	float m_SecondStage;
+	glm::vec3 m_FirstStageColor;
+	glm::vec3 m_SecondStageColor;
+	glm::vec3 m_FinalStageColor;
+	float m_Attenuation;
+
 private:
 	float m_NowTime;
 	float m_LastTime;
