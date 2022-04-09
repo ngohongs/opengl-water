@@ -244,6 +244,11 @@ int Application::Run()
 
             if (ImGui::Button("Reset all settings")) {
                 state.Reset();
+
+
+                state.m_Models["terrain"].SetPosition(glm::vec3(0.0f, state.m_BedHeight, 0.0f));
+                state.m_Models["cube"].SetPosition(glm::vec3(0.0f, state.m_CubeHeight, 0.0f));
+                state.m_Models["cube"].SetMaterial(Material(state.m_CubeColor, state.m_CubeColor, state.m_CubeColor, 30.0f));
             }
 
             ImGui::NewLine();
