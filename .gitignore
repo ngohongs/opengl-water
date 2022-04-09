@@ -349,5 +349,10 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-# Executable folder
-!bin/
+# Model .obj files
+!bin/resources/duck/*
+!bin/resources/terrain/*
+!bin/resources/cube/*
+!resources/duck/*
+!resources/terrain/*
+!resources/cube/*
