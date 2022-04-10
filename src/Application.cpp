@@ -308,7 +308,7 @@ int Application::Run()
                 ImGui::SliderFloat("Wave damping", &state.m_WaveDamping, 0.0f, 1.0f);
                 ImGui::SliderFloat("Wave slope", &state.m_WaveSlope, 0.0f, 0.5f);
                 ImGui::Separator();
-                ImGui::TextWrapped("WARNING: High wave speed can cause instability of the water simulation.");
+                ImGui::TextWrapped("WARNING: Wave speed can cause instability of the water simulation.");
                 ImGui::Separator();
                 ImGui::Separator();
                 ImGui::TextWrapped("Drop parameters:");
@@ -316,6 +316,8 @@ int Application::Run()
                 ImGui::Separator();
                 ImGui::SliderFloat("Drop height", &state.m_Amplitude, 0.0f, 0.5f);
                 ImGui::SliderFloat("Drop radius", &state.m_Radius, 0.0f, 5.0f);
+                ImGui::Separator();
+                ImGui::TextWrapped("Note: Visible while displacing water.");
                 ImGui::Separator();
                 ImGui::Separator();
                 ImGui::TextWrapped("Heightfield water texture:");
