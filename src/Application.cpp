@@ -207,7 +207,7 @@ int Application::Run()
             ImGui::Separator();
             ImGui::Separator();
 
-            ImGui::TextWrapped("OpenGL Water is a sandbox displaying heightfield simulation of a water surface proposed by Matthias Fischer-Mueller using graphics API OpenGL. Additionally it has implemeted Shah's caustics formation, custom reflactions and refractions with same intersection algorithm as caustics calculations");
+            ImGui::TextWrapped("OpenGL Water is a sandbox displaying heightfield simulation of a water surface proposed by Matthias Fischer-Mueller using graphics API OpenGL. Additionally it has implemeted Shah's caustics formation, custom reflactions and refractions with same intersection algorithm as caustics calculations.");
 
             ImGui::NewLine();
 
@@ -221,7 +221,7 @@ int Application::Run()
             ImGui::Separator();
             ImGui::Separator();
 
-            ImGui::TextWrapped("Point crosshair at water surface and drag mouse while holding left mouse button to displace it. To adjust parameters of the simulation switch to cursor mode by pressing E, after that you are able to use GUI of the left panel. Press setting headers (e.g. Water simulation settings) to reveal all parameters of the section. To switch back to preview mode press E again.");
+            ImGui::TextWrapped("Point crosshair at water surface and drag mouse while holding left mouse button to displace it. To adjust parameters of the simulation switch to cursor mode by pressing E, after that you are able to use the GUI of the right panel. Press setting headers (e.g. Water simulation settings) to reveal all parameters of the section. To switch back to preview mode press E again.");
 
             ImGui::Separator();
             ImGui::Separator();
@@ -236,7 +236,7 @@ int Application::Run()
             ImGui::Bullet(); ImGui::TextWrapped("to look around move your mouse");
             ImGui::Bullet(); ImGui::TextWrapped("to displace water drag mouse while holding left mouse button");
             ImGui::Bullet(); ImGui::TextWrapped("to toggle cursor press E");
-            ImGui::Bullet(); ImGui::TextWrapped("to reset water to rest state press Q");
+            ImGui::Bullet(); ImGui::TextWrapped("to reset water to the rest state press Q");
     
             ImGui::Separator();
 
