@@ -31,7 +31,7 @@ vec2 EstimateIntersection(vec3 v, vec3 r, vec3 normal, sampler2D positions) {
 	vec4 recPos = texture(positions, texC);
     if (recPos.a <= 0.0f)
         return vec2(-1.0f);
-	float d = distance(v, recPos.xyz) * (1 - dot(normal, normalize(toCameraDir)));
+	float d = distance(v, recPos.xyz);// * (1 - dot(normal, normalize(toCameraDir)));
 	vec3 p2 = v + d * r;
 	texPt = projection * view * vec4(p2, 1.0);
 	texC = 0.5 * (texPt.xy/texPt.w) + 0.5;
