@@ -19,7 +19,9 @@ State::State(const int& width, const int& height)
 		i = false;
 	m_M1Prev = false;
 	m_EPrev = false;
+	m_RPrev = false;
 	m_CursorMode = false;
+	m_NoGUI = false;
 	m_Res = 64;
 	m_Light = Light(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
 		{ 0.1f, 0.1f, 0.1f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f });
@@ -92,7 +94,7 @@ void State::Reset()
 	m_WaveSlope = 0.3f;
 
 	m_CausticsAbsorbtion = 1.0f;
-	m_CausticsPower = 95.f;
+	m_CausticsPower = 50.0f;
 
 	m_FirstGuess = 0.1f;
 }

@@ -18,7 +18,7 @@ extern void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 extern void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 extern void processInput();
 
-enum { M1, E, KEY_COUNT };
+enum { M1, E, R, KEY_COUNT };
 
 struct State
 {
@@ -32,7 +32,9 @@ public:
 	bool m_KeyMap[KEY_COUNT] = { false };
 	bool m_M1Prev;
 	bool m_EPrev;
+	bool m_RPrev;
 	bool m_CursorMode;
+	bool m_NoGUI;
 	std::map<std::string, Model> m_Models;
 	std::map<std::string, Geometry> m_Geometry;
 	int m_Res;

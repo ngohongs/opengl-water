@@ -47,6 +47,10 @@ void processInput()
         camera.Slide(speed, DirectionEnum::RIGHT);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         state.m_Abort = true;
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+        state.m_KeyMap[R] = true;
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_RELEASE)
+        state.m_KeyMap[R] = false;
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         state.m_Stop = true;
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
@@ -92,6 +96,16 @@ void processInput()
         }
     }
 
+    if (state.m_KeyMap[R] && !state.m_RPrev) {
+        if (state.m_NoGUI) {
+            state.m_NoGUI = false;
+        }
+        else {
+            state.m_NoGUI = true;
+        }
+    }
+
+    state.m_RPrev = state.m_KeyMap[R];
     state.m_EPrev = state.m_KeyMap[E];
     state.m_M1Prev = state.m_KeyMap[M1];
 }
@@ -174,288 +188,292 @@ int Application::Run()
         cauticsRenderer.Render();
         sceneRenderer.Render();
 
-        crosshair.Draw();
+        if (!state.m_NoGUI) {
+            crosshair.Draw();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        {
-            int scale = 6;
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            {
+                int scale = 6;
 
-            float texWidth = (float) (state.m_Window.GetWidth() / scale);
-            float texHeight = (float) (state.m_Window.GetHeight() / scale);
-            ImVec2 texSize = ImVec2(texWidth, texHeight);
-            const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-            float windowWidth = main_viewport->Size.x / (scale - 1);
-            ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + main_viewport->Size.x - main_viewport->Size.x / (scale - 1), main_viewport->WorkPos.y), ImGuiCond_Always);
-            ImGui::SetNextWindowSize(ImVec2(windowWidth, main_viewport->Size.y), ImGuiCond_Always);
-            
-            ImGuiWindowFlags window_flags = 0;
-            window_flags |= ImGuiWindowFlags_NoMove
-                | ImGuiWindowFlags_NoResize
-                | ImGuiWindowFlags_NoCollapse;
+                float texWidth = (float)(state.m_Window.GetWidth() / scale);
+                float texHeight = (float)(state.m_Window.GetHeight() / scale);
+                ImVec2 texSize = ImVec2(texWidth, texHeight);
+                const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+                float windowWidth = main_viewport->Size.x / (scale - 1);
+                ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + main_viewport->Size.x - main_viewport->Size.x / (scale - 1), main_viewport->WorkPos.y), ImGuiCond_Always);
+                ImGui::SetNextWindowSize(ImVec2(windowWidth, main_viewport->Size.y), ImGuiCond_Always);
 
-            ImGui::Begin("OpenGL Water", NULL, window_flags);     
-            ImGui::PushItemWidth(windowWidth / 2.0f);
-   
-            ImGui::TextWrapped("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::Separator();
-            ImGui::Separator();
+                ImGuiWindowFlags window_flags = 0;
+                window_flags |= ImGuiWindowFlags_NoMove
+                    | ImGuiWindowFlags_NoResize
+                    | ImGuiWindowFlags_NoCollapse;
 
-            ImGui::TextWrapped("Description:");
+                ImGui::Begin("OpenGL Water", NULL, window_flags);
+                ImGui::PushItemWidth(windowWidth / 2.0f);
 
-            ImGui::Separator();
-            ImGui::Separator();
+                ImGui::TextWrapped("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                ImGui::Separator();
+                ImGui::Separator();
 
-            ImGui::TextWrapped("OpenGL Water is a sandbox displaying heightfield simulation of a water surface proposed by Matthias Fischer-Mueller using graphics API OpenGL. Additionally it has implemeted Shah's caustics formation, custom reflactions and refractions with same intersection algorithm as caustics calculations.");
+                ImGui::TextWrapped("Description:");
 
-            ImGui::NewLine();
+                ImGui::Separator();
+                ImGui::Separator();
 
-            ImGui::TextWrapped("Apart from the water surface other objects are naively shaded with Phong's empiric model. Color of under water objects are shifted and attuneuated according to the distance from the water surface.");
-          
-            ImGui::Separator();
-            ImGui::Separator();
+                ImGui::TextWrapped("OpenGL Water is a sandbox displaying heightfield simulation of a water surface proposed by Matthias Fischer-Mueller using graphics API OpenGL. Additionally it has implemeted Shah's caustics formation, custom reflactions and refractions with same intersection algorithm as caustics calculations.");
 
-            ImGui::TextWrapped("Usage:");
-            
-            ImGui::Separator();
-            ImGui::Separator();
+                ImGui::NewLine();
 
-            ImGui::TextWrapped("Point crosshair at water surface and drag mouse while holding left mouse button to displace it. To adjust parameters of the simulation switch to cursor mode by pressing E, after that you are able to use the GUI of the right panel. Press setting headers (e.g. Water simulation settings) to reveal all parameters of the section. To switch back to preview mode press E again.");
+                ImGui::TextWrapped("Apart from the water surface other objects are naively shaded with Phong's empiric model. Color of under water objects are shifted and attuneuated according to the distance from the water surface.");
 
-            ImGui::Separator();
-            ImGui::Separator();
+                ImGui::Separator();
+                ImGui::Separator();
 
-            ImGui::TextWrapped("Controls:");
+                ImGui::TextWrapped("Usage:");
 
-            ImGui::Separator();
-            ImGui::Separator();
+                ImGui::Separator();
+                ImGui::Separator();
 
-            ImGui::Bullet(); ImGui::TextWrapped("to exit program press Esc");
-            ImGui::Bullet(); ImGui::TextWrapped("to move press WSAD");
-            ImGui::Bullet(); ImGui::TextWrapped("to look around move your mouse");
-            ImGui::Bullet(); ImGui::TextWrapped("to displace water drag mouse while holding left mouse button");
-            ImGui::Bullet(); ImGui::TextWrapped("to toggle cursor press E");
-            ImGui::Bullet(); ImGui::TextWrapped("to reset water to the rest state press Q");
-    
-            ImGui::Separator();
+                ImGui::TextWrapped("Point crosshair at water surface and drag mouse while holding left mouse button to displace it. To adjust parameters of the simulation switch to cursor mode by pressing E, after that you are able to use the GUI of the right panel. Press setting headers (e.g. Water simulation settings) to reveal all parameters of the section. To switch back to preview mode press E again.");
 
-            ImGui::NewLine();
+                ImGui::Separator();
+                ImGui::Separator();
 
-            if (ImGui::Button("Reset all settings")) {
-                state.Reset();
+                ImGui::TextWrapped("Controls:");
+
+                ImGui::Separator();
+                ImGui::Separator();
+
+                ImGui::Bullet(); ImGui::TextWrapped("to exit program press Esc");
+                ImGui::Bullet(); ImGui::TextWrapped("to move press WSAD");
+                ImGui::Bullet(); ImGui::TextWrapped("to look around move your mouse");
+                ImGui::Bullet(); ImGui::TextWrapped("to displace water drag mouse while holding left mouse button");
+                ImGui::Bullet(); ImGui::TextWrapped("to toggle cursor press E");
+                ImGui::Bullet(); ImGui::TextWrapped("to toggle GUI press R");
+                ImGui::Bullet(); ImGui::TextWrapped("to reset water to the rest state press Q");
+
+                ImGui::Separator();
+
+                ImGui::NewLine();
+
+                if (ImGui::Button("Reset all settings")) {
+                    state.Reset();
 
 
-                state.m_Models["terrain"].SetPosition(glm::vec3(0.0f, state.m_BedHeight, 0.0f));
-                state.m_Models["cube"].SetPosition(glm::vec3(0.0f, state.m_CubeHeight, 0.0f));
-                state.m_Models["cube"].SetMaterial(Material(state.m_CubeColor, state.m_CubeColor, state.m_CubeColor, 30.0f));
+                    state.m_Models["terrain"].SetPosition(glm::vec3(0.0f, state.m_BedHeight, 0.0f));
+                    state.m_Models["cube"].SetPosition(glm::vec3(0.0f, state.m_CubeHeight, 0.0f));
+                    state.m_Models["cube"].SetMaterial(Material(state.m_CubeColor, state.m_CubeColor, state.m_CubeColor, 30.0f));
+                }
+
+                ImGui::NewLine();
+
+                if (ImGui::CollapsingHeader("Object lighting settings")) {
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Object parameters:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::ColorEdit3("Cube color", (float*)&state.m_CubeColor);
+                    state.m_Models["cube"].SetMaterial(Material(state.m_CubeColor, state.m_CubeColor, state.m_CubeColor, 30.0f));
+                    ImGui::SliderFloat("Cube height", &state.m_CubeHeight, -3.0f, 3.0f);
+                    state.m_Models["cube"].SetPosition(glm::vec3(0.0f, state.m_CubeHeight, 0.0f));
+
+                    ImGui::NewLine();
+
+                    ImGui::SliderFloat("Bed height", &state.m_BedHeight, -3.0f, 3.0f);
+                    state.m_Models["terrain"].SetPosition(glm::vec3(0.0f, state.m_BedHeight, 0.0f));
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Note: Color can be picked using a color picker by pressing the colored square right of the RGB values.");
+
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Light parameters:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SliderFloat("Light absorbtion", &state.m_Attenuation, 0.0f, 5.0f);
+                    ImGui::NewLine();
+
+                    ImGui::SliderFloat("First stage cutoff", &state.m_FirstStage, 0.0f, 3.0f);
+                    if (state.m_FirstStage >= state.m_SecondStage && state.m_FirstStage + 0.001f <= 3.0f)
+                        state.m_SecondStage = state.m_FirstStage + 0.001f;
+                    ImGui::ColorEdit3("First stage color", (float*)&state.m_FirstStageColor);
+                    ImGui::NewLine();
+                    ImGui::SliderFloat("Second stage cutoff", &state.m_SecondStage, 0.0f, 3.0f);
+                    if (state.m_SecondStage <= state.m_FirstStage && state.m_SecondStage - 0.001f >= 0.0f)
+                        state.m_FirstStage = state.m_SecondStage - 0.001f;
+                    ImGui::ColorEdit3("Second stage color", (float*)&state.m_SecondStageColor);
+                    ImGui::NewLine();
+                    ImGui::ColorEdit3("Final stage color", (float*)&state.m_FinalStageColor);
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Note: All light properties revolve around the distance of an object from the water surface. Before adjusting these I recommend to play with parameters 'Cube height' and 'Bed height' to observe the effects of the properties above.");
+                    ImGui::Separator();
+                    ImGui::NewLine();
+                }
+
+                if (ImGui::CollapsingHeader("Water simulation settings")) {
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Wave parameters:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SliderFloat("Wave speed", &state.m_WaveSpeed, 0.0f, 1.0f);
+                    if (state.m_WaveSpeed >= (1.0f / state.m_Res) / state.m_DeltaTime)
+                        state.m_WaveSpeed = ((1.0f / state.m_Res) / state.m_DeltaTime) * 0.999f;
+                    ImGui::SliderFloat("Wave damping", &state.m_WaveDamping, 0.0f, 1.0f);
+                    ImGui::SliderFloat("Wave slope", &state.m_WaveSlope, 0.0f, 0.5f);
+                    ImGui::Separator();
+                    ImGui::TextWrapped("WARNING: Wave speed can cause instability of the water simulation.");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Drop parameters:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SliderFloat("Drop height", &state.m_Amplitude, 0.0f, 0.5f);
+                    ImGui::SliderFloat("Drop radius", &state.m_Radius, 0.0f, 5.0f);
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Note: Visible while displacing water.");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Heightfield water texture:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::NewLine();
+                    if (ImGui::Button("Reset heightfield"))
+                        state.m_Abort = true;
+                    ImGui::NewLine();
+                    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
+                    ImGui::Image(
+                        (void*)(intptr_t)state.m_HeightField.GetTexture(),
+                        ImVec2(texWidth, texWidth));
+                    ImGui::Separator();
+                    ImGui::NewLine();
+                }
+
+                if (ImGui::CollapsingHeader("Caustics settings")) {
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Caustics parameters:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SliderFloat("Caustics Power", &state.m_CausticsPower, 0.0f, 100.0f);
+                    ImGui::SliderFloat("Caustics Absorbtion", &state.m_CausticsAbsorbtion, 0.0f, 5.0f);
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Note: Best observed while the water is moving.");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Receiver positions:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
+                    ImGui::Image(
+                        (void*)(intptr_t)state.m_ReceiverPositions.GetTexture(),
+                        texSize
+                    );
+
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Water normals:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
+                    ImGui::Image(
+                        (void*)(intptr_t)state.m_RefractiveNormals.GetTexture(),
+                        texSize
+                    );
+
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Caustics map:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
+                    ImGui::Image(
+                        (void*)(intptr_t)state.m_CausticMap.GetTexture(),
+                        texSize
+                    );
+
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Lowpassed caustics map:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
+                    ImGui::Image(
+                        (void*)(intptr_t)state.m_Filtered.GetTexture(),
+                        texSize
+                    );
+                    ImGui::Separator();
+                    ImGui::NewLine();
+
+                }
+
+                if (ImGui::CollapsingHeader("Reflections/refractions settings")) {
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Reflections/refractions parameters:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SliderFloat("First guess", &state.m_FirstGuess, 0.0f, 5.0f);
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Note: Best observed while the water is still.");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Reflections positions:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
+                    ImGui::Image(
+                        (void*)(intptr_t)state.m_ReflectionsPositions.GetTexture(),
+                        texSize
+                    );
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Reflections texture:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
+                    ImGui::Image(
+                        (void*)(intptr_t)state.m_Reflections.GetTexture(),
+                        texSize
+                    );
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Refractions positions:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
+                    ImGui::Image(
+                        (void*)(intptr_t)state.m_RefractionsPositions.GetTexture(),
+                        texSize
+                    );
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Refractions texture:");
+                    ImGui::Separator();
+                    ImGui::Separator();
+                    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
+                    ImGui::Image(
+                        (void*)(intptr_t)state.m_Refractions.GetTexture(),
+                        texSize
+                    );
+                    ImGui::Separator();
+                    ImGui::TextWrapped("Note: Textures are flipped due to different coordinate systems of texture and screen space.");
+                    ImGui::Separator();
+                    ImGui::NewLine();
+
+                }
+
+                ImGui::End();
             }
-
-            ImGui::NewLine();
-
-            if (ImGui::CollapsingHeader("Object lighting settings")) {
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Object parameters:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::ColorEdit3("Cube color", (float*)&state.m_CubeColor);
-                state.m_Models["cube"].SetMaterial(Material(state.m_CubeColor, state.m_CubeColor, state.m_CubeColor, 30.0f));
-                ImGui::SliderFloat("Cube height", &state.m_CubeHeight, -3.0f, 3.0f);
-                state.m_Models["cube"].SetPosition(glm::vec3(0.0f, state.m_CubeHeight, 0.0f));
-
-                ImGui::NewLine();
-
-                ImGui::SliderFloat("Bed height", &state.m_BedHeight, -3.0f, 3.0f);
-                state.m_Models["terrain"].SetPosition(glm::vec3(0.0f, state.m_BedHeight, 0.0f));
-                ImGui::Separator();
-                ImGui::TextWrapped("Note: Color can be picked using a color picker by pressing the colored square right of the RGB values.");
-
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Light parameters:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SliderFloat("Light absorbtion", &state.m_Attenuation, 0.0f, 5.0f);
-                ImGui::NewLine();
-
-                ImGui::SliderFloat("First stage cutoff", &state.m_FirstStage, 0.0f, 3.0f);
-                if (state.m_FirstStage >= state.m_SecondStage && state.m_FirstStage + 0.001f <= 3.0f)
-                    state.m_SecondStage = state.m_FirstStage + 0.001f;
-                ImGui::ColorEdit3("First stage color", (float*)&state.m_FirstStageColor);
-                ImGui::NewLine();
-                ImGui::SliderFloat("Second stage cutoff", &state.m_SecondStage, 0.0f, 3.0f);
-                if (state.m_SecondStage <= state.m_FirstStage && state.m_SecondStage - 0.001f >= 0.0f)
-                    state.m_FirstStage = state.m_SecondStage - 0.001f;
-                ImGui::ColorEdit3("Second stage color", (float*)&state.m_SecondStageColor);
-                ImGui::NewLine();
-                ImGui::ColorEdit3("Final stage color", (float*)&state.m_FinalStageColor);
-                ImGui::Separator();
-                ImGui::TextWrapped("Note: All light properties revolve around the distance of an object from the water surface. Before adjusting these I recommend to play with parameters 'Cube height' and 'Bed height' to observe the effects of the properties above.");
-                ImGui::Separator();
-                ImGui::NewLine();
-            }
-
-            if (ImGui::CollapsingHeader("Water simulation settings")) {
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Wave parameters:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SliderFloat("Wave speed", &state.m_WaveSpeed, 0.0f, 1.0f);
-                if (state.m_WaveSpeed >= (1.0f / state.m_Res) / state.m_DeltaTime)
-                    state.m_WaveSpeed = ((1.0f / state.m_Res) / state.m_DeltaTime) * 0.999f;
-                ImGui::SliderFloat("Wave damping", &state.m_WaveDamping, 0.0f, 1.0f);
-                ImGui::SliderFloat("Wave slope", &state.m_WaveSlope, 0.0f, 0.5f);
-                ImGui::Separator();
-                ImGui::TextWrapped("WARNING: Wave speed can cause instability of the water simulation.");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Drop parameters:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SliderFloat("Drop height", &state.m_Amplitude, 0.0f, 0.5f);
-                ImGui::SliderFloat("Drop radius", &state.m_Radius, 0.0f, 5.0f);
-                ImGui::Separator();
-                ImGui::TextWrapped("Note: Visible while displacing water.");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Heightfield water texture:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::NewLine();
-                if (ImGui::Button("Reset heightfield"))
-                    state.m_Abort = true;
-                ImGui::NewLine();
-                ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
-                ImGui::Image(
-                    (void*)(intptr_t) state.m_HeightField.GetTexture(),
-                    ImVec2(texWidth, texWidth));
-                ImGui::Separator();
-                ImGui::NewLine();
-            }
-
-            if (ImGui::CollapsingHeader("Caustics settings")) {
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Caustics parameters:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SliderFloat("Caustics Power", &state.m_CausticsPower, 0.0f, 100.0f);
-                ImGui::SliderFloat("Caustics Absorbtion", &state.m_CausticsAbsorbtion, 0.0f, 5.0f);
-                ImGui::Separator();
-                ImGui::TextWrapped("Note: Best observed while the water is moving.");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Receiver positions:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
-                ImGui::Image(
-                    (void*)(intptr_t)state.m_ReceiverPositions.GetTexture(),
-                    texSize
-                );
-
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Water normals:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
-                ImGui::Image(
-                    (void*)(intptr_t)state.m_RefractiveNormals.GetTexture(),
-                    texSize
-                );
-
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Caustics map:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
-                ImGui::Image(
-                    (void*)(intptr_t)state.m_CausticMap.GetTexture(),
-                    texSize
-                );
-
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Lowpassed caustics map:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
-                ImGui::Image(
-                    (void*)(intptr_t)state.m_Filtered.GetTexture(),
-                    texSize
-                );
-                ImGui::Separator();
-                ImGui::NewLine();
-               
-            }
-
-            if (ImGui::CollapsingHeader("Reflections/refractions settings")) {
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Reflections/refractions parameters:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SliderFloat("First guess", &state.m_FirstGuess, 0.0f, 5.0f);
-                ImGui::Separator();
-                ImGui::TextWrapped("Note: Best observed while the water is still.");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Reflections positions:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
-                ImGui::Image(
-                    (void*)(intptr_t)state.m_ReflectionsPositions.GetTexture(),
-                    texSize
-                );
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Reflections texture:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
-                ImGui::Image(
-                    (void*)(intptr_t)state.m_Reflections.GetTexture(),
-                    texSize
-                );
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Refractions positions:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
-                ImGui::Image(
-                    (void*)(intptr_t)state.m_RefractionsPositions.GetTexture(),
-                    texSize
-                );
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::TextWrapped("Refractions texture:");
-                ImGui::Separator();
-                ImGui::Separator();
-                ImGui::SetCursorPosX((ImGui::GetWindowSize().x - texWidth) * 0.5f);
-                ImGui::Image(
-                    (void*)(intptr_t)state.m_Refractions.GetTexture(),
-                    texSize
-                );
-                ImGui::Separator();
-                ImGui::TextWrapped("Note: Textures are flipped due to different coordinate systems of texture and screen space.");
-                ImGui::Separator();
-                ImGui::NewLine();
-
-            }
-
-            ImGui::End();
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+       
     }
 
     ImGui_ImplOpenGL3_Shutdown();

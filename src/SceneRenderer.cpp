@@ -87,7 +87,7 @@ void SceneRenderer::Render()
                 m_Receiver.SetVec3("firstStageColor", state.m_FirstStageColor);
                 m_Receiver.SetVec3("secondStageColor", state.m_SecondStageColor);
                 m_Receiver.SetVec3("finalStageColor", state.m_FinalStageColor);
-                state.m_CausticMap.Bind(GL_TEXTURE0);
+                state.m_Filtered.Bind(GL_TEXTURE0);
                 state.m_ReceiverPositions.Bind(GL_TEXTURE1);
 
                 state.m_Models["terrain"].Draw(m_Receiver);
@@ -148,7 +148,7 @@ void SceneRenderer::Render()
                 m_Receiver.SetVec3("firstStageColor", state.m_FirstStageColor);
                 m_Receiver.SetVec3("secondStageColor", state.m_SecondStageColor);
                 m_Receiver.SetVec3("finalStageColor", state.m_FinalStageColor);
-                state.m_CausticMap.Bind(GL_TEXTURE0);
+                state.m_Filtered.Bind(GL_TEXTURE0);
                 state.m_ReceiverPositions.Bind(GL_TEXTURE1);
                 state.m_HeightField.Bind(GL_TEXTURE2);
 
@@ -186,7 +186,7 @@ void SceneRenderer::Render()
             m_Receiver.SetVec3("firstStageColor", state.m_FirstStageColor);
             m_Receiver.SetVec3("secondStageColor", state.m_SecondStageColor);
             m_Receiver.SetVec3("finalStageColor", state.m_FinalStageColor);
-            state.m_CausticMap.Bind(GL_TEXTURE0);
+            state.m_Filtered.Bind(GL_TEXTURE0);
             state.m_ReceiverPositions.Bind(GL_TEXTURE1);
             state.m_HeightField.Bind(GL_TEXTURE2);
 

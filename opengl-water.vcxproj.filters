@@ -210,6 +210,8 @@
     <None Include="shaders\receiver.frag" />
     <None Include="shaders\lowpass.vert" />
     <None Include="shaders\lowpass.frag" />
+    <None Include="shaders\displaytexture.vert" />
+    <None Include="shaders\displaytexture.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="shaders\caustics.vert" />

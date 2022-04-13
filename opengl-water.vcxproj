@@ -221,6 +221,8 @@ xcopy /Y /E "$(SolutionDir)shaders" "$(SolutionDir)bin\shaders\"</Command>
     <None Include="shaders\caustics.frag" />
     <None Include="shaders\crosshair.frag" />
     <None Include="shaders\crosshair.vert" />
+    <None Include="shaders\displaytexture.frag" />
+    <None Include="shaders\displaytexture.vert" />
     <None Include="shaders\lowpass.frag" />
     <None Include="shaders\lowpass.vert" />
     <None Include="shaders\normals.frag" />
