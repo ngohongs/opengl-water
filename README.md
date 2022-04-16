@@ -54,4 +54,4 @@ Height Fields [online]. London, England, 2008 [cit. 2022-04-15]. Available
 at: https://www.gdcvault.com/play/203/Fast-Water-Simulationfor-Games. https://archive.org/details/GDC2008Fischer.
 
 <a name="2">[2]</a> SHAH, Musawir; KONTTINEN, Jaakko; PATTANAIK, Sumanta. Caustics Mapping: An Image-Space Technique for Real-Time Caustics. IEEE
-transactions on visualization and computer graphics. 2007, roč. 13, s. 272–280. Available from doi: 10.1109/TVCG.2007.32.
+transactions on visualization and computer graphics. 2007, y. 13, p. 272–280. Available from doi: 10.1109/TVCG.2007.32.
