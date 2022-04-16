@@ -226,7 +226,7 @@ int Application::Run()
 
                 ImGui::NewLine();
 
-                ImGui::TextWrapped("Apart from the water surface other objects are naively shaded with Phong's empiric model. Color of under water objects are shifted and attuneuated according to the distance from the water surface.");
+                ImGui::TextWrapped("Apart from the water surface other objects are naively shaded with Phong's empiric model. Color of under water objects are shifted and attenuated according to the distance from the water surface.");
 
                 ImGui::Separator();
                 ImGui::Separator();
