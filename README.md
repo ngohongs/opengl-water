@@ -17,7 +17,7 @@ Point crosshair at water surface and drag mouse while holding left mouse button 
 * to displace water drag mouse while holding left mouse button
 * to toggle cursor press E
 * to toggle GUI press R
-* to reset water to the rest state press Q"
+* to reset water to the rest state press Q
 
 # Dependencies
 * [GLEW](http://glew.sourceforge.net/)
@@ -35,7 +35,7 @@ Executable file is located in [bin](bin) folder. Be noted that every file locate
 
 # Compilation
 
-For Windows open the [solution file](opengl-water.sln) choose `Release` and build by pressing `Ctrl + Shift + B`. All dependencies have been predownloaded and should link with immiediantly after compilation. 
+For Windows open the [solution file](opengl-water.sln) choose `Release` and build by pressing `Ctrl + Shift + B`. All dependencies have been predownloaded and should link with the program  immiediantly after compilation. After completed build executable files can be located in [bin](bin) folder. 
 
 For other OS `int WINAPI WinMain` in [src/main.cpp](src/main.cpp) should be change to `int main`. Dependencies compiled for your OS stated above need to be also installed. After that the project should be able to be compiled.  
 
