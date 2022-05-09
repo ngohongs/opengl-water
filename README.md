@@ -1,5 +1,11 @@
 # OpenGL Water
 
+## Preview
+
+https://user-images.githubusercontent.com/56195457/167486731-077a427f-d7e6-43cb-8a45-02ab020ef26a.mp4
+
+https://user-images.githubusercontent.com/56195457/167486739-1e3a98ce-8202-4038-9c53-3814bcf892a4.mp4
+
 ## Description
 
 OpenGL Water is a sandbox displaying heightfield simulation of a water surface proposed by Matthias Fischer-Mueller [[1]](#1) using graphics API OpenGL. Additionally it has implemeted Shah's [[2]](#2) caustics formation, custom reflactions and refractions with same intersection algorithm as caustics calculations.
